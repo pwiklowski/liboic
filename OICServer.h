@@ -2,7 +2,9 @@
 #define OICSERVER_H
 
 #include "pthread.h"
+#include <stdint.h>
 
+typedef void(*OICServerSendData)(uint8_t*, uint16_t);
 
 class OICServer
 {

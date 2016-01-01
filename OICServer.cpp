@@ -27,20 +27,37 @@ void* OICServer::run(void* param){
     serv.sin_port = htons(9999);
     serv.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    char buffer[256];
+    uint8_t buffer[1024];
     socklen_t l = sizeof(client);
 
     if( bind(sockfd , (struct sockaddr*)&serv, sizeof(serv) ) == -1)
     {
+        std::cout << "Unable to bind";
+        return 0;
     }
 
     while(1){
-        int rc= recvfrom(sockfd,buffer,sizeof(buffer),0,(struct sockaddr *)&client,&l);
+        size_t rc= recvfrom(sockfd,buffer,sizeof(buffer),0,(struct sockaddr *)&client,&l);
         if(rc<0)
         {
             std::cout<<"ERROR READING FROM SOCKET";
         }
-        std::cout<<"\n the message received is : "<<buffer<<std::endl;
-        coap_server.handleMessage((uint8_t*)buffer, rc);
+
+        COAPPacket* p = new COAPPacket(buffer, rc);
+
+        COAPPacket* response = coap_server.handleMessage(p);
+
+        size_t response_len;
+
+        response->build(buffer, &response_len);
+
+
+
+        sendto(sockfd,buffer, response_len, 0, (struct sockaddr*)&client,l);
     }
 }
+
+
+
+
+
