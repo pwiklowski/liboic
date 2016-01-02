@@ -11,6 +11,7 @@ public:
     COAPServer();
 
     COAPPacket *handleMessage(COAPPacket* p);
+    void addEndpoint(string url );
 
 private:
 };

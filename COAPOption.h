@@ -12,7 +12,7 @@ class COAPOption
 public:
     COAPOption(uint8_t num, vector<uint8_t> data);
     uint8_t getNumber() { return m_num;}
-    vector<uint8_t> getData() { return m_data;}
+    vector<uint8_t>* getData() { return &m_data;}
 
 private:
     uint8_t m_num;

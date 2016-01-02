@@ -92,7 +92,7 @@ class COAPPacket
 {
 public:
     COAPPacket(uint8_t *data, size_t len);
-    COAPPacket(COAPOption option, string content, uint8_t msgid_hi, uint8_t msgid_lo, const coap_buffer_t* token, coap_responsecode_t rspcode);
+    COAPPacket(COAPOption *option, string content, uint8_t msgid_hi, uint8_t msgid_lo, const coap_buffer_t* token, coap_responsecode_t rspcode);
 
     std::string getUri();
 
@@ -104,11 +104,8 @@ public:
 private:
     coap_header_t hdr;          /* Header of the packet */
     coap_buffer_t tok;          /* Token value, size as specified by hdr.tkl */
-    uint8_t numopts;            /* Number of options */
-    coap_option_t opts[16]; /* Options of the packet. For possible entries see
-                                 * http://tools.ietf.org/html/rfc7252#section-5.10 */
 
-    vector<COAPOption> m_options;
+    vector<COAPOption*> m_options;
 
     string payload;
 
@@ -116,8 +113,8 @@ private:
 
     bool parseHeader(coap_header_t *hdr, const uint8_t *buf, size_t buflen);
     bool parseToken(coap_buffer_t *tokbuf, const coap_header_t *hdr, const uint8_t *buf, size_t buflen);
-    bool parseOptions(coap_option_t *options, uint8_t *numOptions, const coap_header_t *hdr, const uint8_t *buf, size_t buflen);
-    bool parseOption(coap_option_t *option, uint16_t *running_delta, const uint8_t **buf, size_t buflen);
+    bool parseOptions(const coap_header_t *hdr, const uint8_t *buf, size_t buflen);
+    bool parseOption(uint16_t *running_delta, const uint8_t **buf, size_t buflen);
 
 
 };
