@@ -3,6 +3,7 @@
 
 #include "pthread.h"
 #include <stdint.h>
+#include "COAPServer.h"
 
 typedef void(*OICServerSendData)(uint8_t*, uint16_t);
 
@@ -12,7 +13,6 @@ public:
     OICServer();
 
     void start();
-
 private:
     static void* run(void*param);
 

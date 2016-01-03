@@ -93,6 +93,7 @@ class COAPPacket
 public:
     COAPPacket(uint8_t *data, size_t len);
     COAPPacket(COAPOption *option, string content, uint8_t msgid_hi, uint8_t msgid_lo, const coap_buffer_t* token, coap_responsecode_t rspcode);
+    COAPPacket(uint8_t msgid_hi, uint8_t msgid_lo, const coap_buffer_t* token);
 
     std::string getUri();
 
@@ -101,13 +102,21 @@ public:
     coap_header_t* getHeader(){ return &hdr;}
     coap_buffer_t* getToken(){ return &tok;}
 
+    string getPayload(){ return m_payload; }
+
+
+    void addOption(COAPOption* option){ m_options.push_back(option);}
+    void addPayload(string payload){ m_payload = payload; }
+
+    void setType(uint16_t type){ hdr.t = type;}
+    void setResonseCode(uint8_t responseCode){ hdr.code = responseCode; }
+
 private:
     coap_header_t hdr;          /* Header of the packet */
     coap_buffer_t tok;          /* Token value, size as specified by hdr.tkl */
-
+    string m_payload;
     vector<COAPOption*> m_options;
 
-    string payload;
 
 
 

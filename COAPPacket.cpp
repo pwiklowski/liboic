@@ -81,6 +81,10 @@ bool COAPPacket::parseOptions(const coap_header_t *hdr, const uint8_t *buf, size
 
     if (p+1 < end && *p == 0xFF)  // payload marker
     {
+        while(p<=end){
+            m_payload +=*(p+1);
+            p++;
+        }
         //payload->p = p+1;
         //payload->len = end-(p+1);
     }
@@ -170,11 +174,11 @@ int COAPPacket::build(uint8_t *buf, size_t *buflen)
 
     opts_len = (p - buf) - 4;   // number of bytes used by options
 
-    if (payload.length()> 0)
+    if (m_payload.length()> 0)
     {
         buf[4 + opts_len] = 0xFF;  // payload marker
-        memcpy(buf+5 + opts_len, payload.c_str(), payload.length());
-        *buflen = opts_len + 5 + payload.length();
+        memcpy(buf+5 + opts_len, m_payload.c_str(), m_payload.length());
+        *buflen = opts_len + 5 + m_payload.length();
     }
     else
         *buflen = opts_len + 4;
@@ -218,5 +222,19 @@ COAPPacket::COAPPacket(COAPOption* option, string content, uint8_t msgid_hi, uin
     if (option !=NULL)
         m_options.push_back(option);
 
-    payload = content;
+    m_payload = content;
+}
+
+COAPPacket::COAPPacket(uint8_t msgid_hi, uint8_t msgid_lo, const coap_buffer_t* token)
+{
+    hdr.ver = 0x01;
+    hdr.tkl = 0;
+    hdr.id[0] = msgid_hi;
+    hdr.id[1] = msgid_lo;
+
+    // need token in response
+    if (token) {
+        hdr.tkl = token->len;
+        tok = *token;
+    }
 }

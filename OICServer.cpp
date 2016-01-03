@@ -5,11 +5,34 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <iostream>
-#include "COAPServer.h"
 
 OICServer::OICServer()
 {
 
+
+}
+
+static void temperatureCallback(COAPPacket* request, COAPPacket* response){
+    static int temp =0;
+    response->setType(COAP_TYPE_ACK);
+    if (request->getHeader()->code == COAP_METHOD_GET){
+        response->setResonseCode(COAP_RSPCODE_CONTENT);
+
+        string r = to_string(temp++);
+
+        vector<uint8_t> data;
+        data.push_back(((uint16_t)COAP_CONTENTTYPE_TEXT_PLAIN & 0xFF00) >> 8);
+        data.push_back(((uint16_t)COAP_CONTENTTYPE_TEXT_PLAIN & 0xFF));
+
+        response->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, data));
+        response->addPayload(r);
+
+    }else if(request->getHeader()->code == COAP_METHOD_POST){
+        string value = request->getPayload();
+        response->setResonseCode(COAP_RSPCODE_CHANGED);
+        temp = atoi(value.c_str());
+
+    }
 
 }
 void OICServer::start(){
@@ -17,8 +40,16 @@ void OICServer::start(){
     pthread_join(m_thread, NULL);
 }
 void* OICServer::run(void* param){
-    COAPServer coap_server;
     OICServer* server = (OICServer*) param;
+
+    COAPServer coap_server;
+    coap_server.addEndpoint("/temp", "</temp>;rt=\"Temperature\"", temperatureCallback);
+    coap_server.addEndpoint("/temp2", "</temp2>;rt=\"Temperature2\"", temperatureCallback);
+    coap_server.addEndpoint("/temp3", "</temp3>;rt=\"Temperature3\"", temperatureCallback);
+    coap_server.addEndpoint("/temp4", "</temp4>;rt=\"Temperature4\"", temperatureCallback);
+
+
+
     int sockfd;
     sockfd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
     struct sockaddr_in serv,client;
@@ -56,7 +87,6 @@ void* OICServer::run(void* param){
         sendto(sockfd,buffer, response_len, 0, (struct sockaddr*)&client,l);
     }
 }
-
 
 
 
