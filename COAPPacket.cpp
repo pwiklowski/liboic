@@ -8,7 +8,7 @@ COAPPacket::COAPPacket(uint8_t* data, size_t len)
 {
     if (!parseHeader(&hdr, data, len))
         return;
-    if (!parseToken(&tok, &hdr,data,len))
+    if (!parseToken(&hdr,data,len))
         return;
     if (!parseOptions(&hdr, data, len))
         return;
@@ -19,7 +19,7 @@ COAPPacket::COAPPacket(uint8_t* data, size_t len)
     printf("  t    0x%02X\n", hdr.t);
     printf("  tkl  0x%02X\n", hdr.tkl);
     printf("  code 0x%02X\n", hdr.code);
-    printf("  id   0x%02X%02X\n", hdr.id[0], hdr.id[1]);
+    printf("  id   0x%02X\n", hdr.mid);
 
 
     for(int i=0; i<m_options.size(); i++)
@@ -40,28 +40,18 @@ bool COAPPacket::parseHeader(coap_header_t *hdr, const uint8_t *buf, size_t bufl
     hdr->t = (buf[0] & 0x30) >> 4;
     hdr->tkl = buf[0] & 0x0F;
     hdr->code = buf[1];
-    hdr->id[0] = buf[2];
-    hdr->id[1] = buf[3];
+    hdr->mid = buf[3] <<8 | buf[2];
     return true;
 }
-bool COAPPacket::parseToken(coap_buffer_t *tokbuf, const coap_header_t *hdr, const uint8_t *buf, size_t buflen)
+bool COAPPacket::parseToken(const coap_header_t *hdr, const uint8_t *buf, size_t buflen)
 {
-    if (hdr->tkl == 0)
+    if (hdr->tkl <= 8)
     {
-        tokbuf->p = NULL;
-        tokbuf->len = 0;
+        if (4U + hdr->tkl > buflen)
+            return false;
+        for (int i=0; i<hdr->tkl;i++)
+            m_token.push_back(*(buf+4+i));
         return true;
-    }
-    else
-    {
-        if (hdr->tkl <= 8)
-        {
-            if (4U + hdr->tkl > buflen)
-                return false;
-            tokbuf->p = buf+4;
-            tokbuf->len = hdr->tkl;
-            return true;
-        }
     }
     return false;
 }
@@ -82,11 +72,9 @@ bool COAPPacket::parseOptions(const coap_header_t *hdr, const uint8_t *buf, size
     if (p+1 < end && *p == 0xFF)  // payload marker
     {
         while(p<=end){
-            m_payload +=*(p+1);
+            m_payload.push_back(*(p+1));
             p++;
         }
-        //payload->p = p+1;
-        //payload->len = end-(p+1);
     }
 
     return true;
@@ -127,18 +115,14 @@ int COAPPacket::build(uint8_t *buf, size_t *buflen)
     buf[0] |= (hdr.t & 0x03) << 4;
     buf[0] |= (hdr.tkl & 0x0F);
     buf[1] = hdr.code;
-    buf[2] = hdr.id[0];
-    buf[3] = hdr.id[1];
+    buf[2] = hdr.mid;
+    buf[3] = hdr.mid >> 8;
 
     // inject token
     p = buf + 4;
 
-    if (hdr.tkl > 0)
-        std::memcpy(p, tok.p,hdr.tkl);
-
-    p += hdr.tkl;
-
-
+    for (int i=0; i<m_token.size();i++)
+        *(p++) = m_token.at(i);
 
     for ( auto i = m_options.begin(); i != m_options.end(); i++ ) {
 
@@ -174,11 +158,14 @@ int COAPPacket::build(uint8_t *buf, size_t *buflen)
 
     opts_len = (p - buf) - 4;   // number of bytes used by options
 
-    if (m_payload.length()> 0)
+    if (m_payload.size()> 0)
     {
         buf[4 + opts_len] = 0xFF;  // payload marker
-        memcpy(buf+5 + opts_len, m_payload.c_str(), m_payload.length());
-        *buflen = opts_len + 5 + m_payload.length();
+
+        for (int i=0; i<m_payload.size(); i++){
+            buf[5 + opts_len +i ] = m_payload.at(i);  // payload marker
+        }
+        *buflen = opts_len + 5 + m_payload.size();
     }
     else
         *buflen = opts_len + 4;
@@ -203,38 +190,22 @@ string COAPPacket::getUri(){
 }
 
 
-
-COAPPacket::COAPPacket(COAPOption* option, string content, uint8_t msgid_hi, uint8_t msgid_lo, const coap_buffer_t* token, coap_responsecode_t rspcode)
-{
+COAPPacket::COAPPacket(uint16_t msgid, vector<uint8_t> token){
     hdr.ver = 0x01;
     hdr.t = COAP_TYPE_ACK;
-    hdr.tkl = 0;
-    hdr.code = rspcode;
-    hdr.id[0] = msgid_hi;
-    hdr.id[1] = msgid_lo;
-
-    // need token in response
-    if (token) {
-        hdr.tkl = token->len;
-        tok = *token;
-    }
-
-    if (option !=NULL)
-        m_options.push_back(option);
-
-    m_payload = content;
+    hdr.tkl = token.size();
+    hdr.mid = msgid;
+    m_token = token;
 }
 
-COAPPacket::COAPPacket(uint8_t msgid_hi, uint8_t msgid_lo, const coap_buffer_t* token)
-{
-    hdr.ver = 0x01;
-    hdr.tkl = 0;
-    hdr.id[0] = msgid_hi;
-    hdr.id[1] = msgid_lo;
+void COAPPacket::addPayload(string payload){
+    for (int i=0; i<payload.size(); i++){
+        m_payload.push_back(payload.at(i));
+    }
+}
 
-    // need token in response
-    if (token) {
-        hdr.tkl = token->len;
-        tok = *token;
+void COAPPacket::addPayload(uint8_t* payload, uint16_t size){
+    for (int i=0; i<size; i++){
+        m_payload.push_back(*(payload+i));
     }
 }

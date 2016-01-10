@@ -5,7 +5,7 @@
 #include "COAPPacket.h"
 #include <map>
 
-typedef void (*COAPEndpointCallback)(COAPPacket*, COAPPacket*);
+typedef bool (*COAPEndpointCallback)(COAPPacket*, COAPPacket*);
 
 class COAPServer
 {
