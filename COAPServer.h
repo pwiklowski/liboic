@@ -3,9 +3,11 @@
 
 #include <string>
 #include "COAPPacket.h"
+#include <vector>
 #include <map>
 
-typedef bool (*COAPEndpointCallback)(COAPPacket*, COAPPacket*);
+typedef bool (*COAPCallback)(COAPPacket*, COAPPacket*);
+
 
 class COAPServer
 {
@@ -13,12 +15,11 @@ public:
     COAPServer();
 
     COAPPacket *handleMessage(COAPPacket* p);
-    void addEndpoint(string url, string description, COAPEndpointCallback callback);
+    void addResource(string url, COAPCallback callback);
 
 private:
-    map<string, COAPEndpointCallback> m_endpoints;
-    map<string, string> m_descriptions;
 
+    map<string, COAPCallback> m_callbacks;
 };
 
 #endif // COAPPacket_H

@@ -149,7 +149,7 @@ int COAPPacket::build(uint8_t *buf, size_t *buflen)
             *p++ = 0xFF & option->getData()->size()-15;
         }
 
-        for (int i=0; i<option->getData()->size();i++){
+        for (uint16_t i=0; i<option->getData()->size();i++){
             *(p++) = option->getData()->at(i);
         }
 
