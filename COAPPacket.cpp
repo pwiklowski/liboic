@@ -190,12 +190,9 @@ string COAPPacket::getUri(){
 }
 
 
-COAPPacket::COAPPacket(uint16_t msgid, vector<uint8_t> token){
+COAPPacket::COAPPacket(){
     hdr.ver = 0x01;
     hdr.t = COAP_TYPE_ACK;
-    hdr.tkl = token.size();
-    hdr.mid = msgid;
-    m_token = token;
 }
 
 void COAPPacket::addPayload(string payload){

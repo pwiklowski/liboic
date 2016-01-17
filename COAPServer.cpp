@@ -15,7 +15,16 @@ COAPPacket* COAPServer::handleMessage(COAPPacket* p){
     string uri = p->getUri();
     log(uri.c_str());
 
-    COAPPacket* response = new COAPPacket(p->getHeader()->mid, p->getToken());
+    COAPPacket* response = new COAPPacket();
+    response->setMessageId(p->getHeader()->mid);
+
+    vector<uint8_t> t = p->getToken();
+
+    if (t.size() == 2){
+        uint16_t token = t.at(1) << 8 | t.at(0);
+        response->setToken(token);
+    }
+
 
     auto endpoint = m_callbacks.find(uri);
     if (endpoint != m_callbacks.end()){

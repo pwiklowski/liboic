@@ -6,6 +6,7 @@
 #include <string>
 #include "COAPOption.h"
 
+
 typedef struct
 {
     uint8_t ver;                /* CoAP version number */
@@ -94,7 +95,7 @@ class COAPPacket
 {
 public:
     COAPPacket(uint8_t *data, size_t len);
-    COAPPacket(uint16_t msgid, vector<uint8_t> token);
+    COAPPacket();
 
     std::string getUri();
 
@@ -103,7 +104,7 @@ public:
     coap_header_t* getHeader(){ return &hdr;}
     vector<uint8_t> getToken(){ return m_token;}
 
-    vector<uint8_t> getPayload(){ return m_payload; }
+    vector<uint8_t>* getPayload(){ return &m_payload; }
 
 
     void addOption(COAPOption* option){ m_options.push_back(option);}
@@ -113,6 +114,9 @@ public:
 
     void setType(uint16_t type){ hdr.t = type;}
     void setResonseCode(uint8_t responseCode){ hdr.code = responseCode; }
+
+    void setToken(uint16_t token){ hdr.tkl = 2; m_token.push_back(token); m_token.push_back(token >> 8); }
+    void setMessageId(uint16_t id){hdr.mid = id;}
 
 private:
     coap_header_t hdr;          /* Header of the packet */
