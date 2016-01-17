@@ -66,7 +66,30 @@ public:
                 cbor* value = cbor::parse(data, &pointer);
                 aa->append(key, value);
             }
+        }else if (majorType == CBOR_TYPE_NEGATIVE || majorType == CBOR_TYPE_UNSIGNED){
+            if(value < 256ULL) {
+                aa->data()->push_back(value);
+            } else if(value < 65536ULL) {
+                aa->data()->push_back(value >> 8);
+                aa->data()->push_back(value);
+            } else if(value < 4294967296ULL) {
+                aa->data()->push_back(value >> 24);
+                aa->data()->push_back(value >> 16);
+                aa->data()->push_back(value >> 8);
+                aa->data()->push_back(value);
+            } else {
+                aa->data()->push_back(value >> 56);
+                aa->data()->push_back(value >> 48);
+                aa->data()->push_back(value >> 40);
+                aa->data()->push_back(value >> 32);
+                aa->data()->push_back(value >> 24);
+                aa->data()->push_back(value >> 16);
+                aa->data()->push_back(value >> 8);
+                aa->data()->push_back(value);
+            }
+
         }
+
 
         if (p!=0)
             *p = pointer;
@@ -205,6 +228,23 @@ public:
         return out;
     }
 
+    int toInt(){
+        int value;
+
+        if(m_data.size() == 1) {
+            value = m_data.at(0);
+        } else if(m_data.size()== 2) { // 2 byte
+            value = (m_data.at(0) << 8) | m_data.at(1);
+        } else if(m_data.size() == 4) { // 4 byte
+            value = (m_data.at(0) << 24) |
+                    (m_data.at(1) << 16) |
+                    (m_data.at(2) << 8 ) |
+                    (m_data.at(3));
+        }
+        if (m_type ==CBOR_TYPE_NEGATIVE)
+            value = -(value+1);
+        return value;
+    }
 
     vector<uint8_t>* data(){
         return &m_data;
