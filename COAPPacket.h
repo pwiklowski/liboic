@@ -115,6 +115,9 @@ public:
     void setType(uint16_t type){ hdr.t = type;}
     void setResonseCode(uint8_t responseCode){ hdr.code = responseCode; }
 
+    string getAddress() { return m_address;}
+    void setAddress(string address) { m_address = address;}
+
     void setToken(uint16_t token){ hdr.tkl = 2; m_token.push_back(token); m_token.push_back(token >> 8); }
     void setMessageId(uint16_t id){hdr.mid = id;}
 
@@ -123,6 +126,7 @@ private:
     vector<uint8_t> m_token;          /* Token value, size as specified by hdr.tkl */
     vector<uint8_t> m_payload;
     vector<COAPOption*> m_options;
+    string m_address;
 
     bool parseHeader(coap_header_t *hdr, const uint8_t *buf, size_t buflen);
     bool parseToken(const coap_header_t *hdr, const uint8_t *buf, size_t buflen);
