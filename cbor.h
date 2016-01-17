@@ -95,16 +95,36 @@ public:
             m_data.push_back(str.at(i));
     }
 
-    cbor(long long val) {
-        if (val < 0)
+    cbor(long long value) {
+        if (value < 0){
             m_type = CBOR_TYPE_NEGATIVE;
-        else
+            value = -(value+1);
+        } else{
             m_type = CBOR_TYPE_UNSIGNED;
+        }
 
-        //, val);
+        if(value < 256ULL) {
+            m_data.push_back(value);
+        } else if(value < 65536ULL) {
+            m_data.push_back(value >> 8);
+            m_data.push_back(value);
+        } else if(value < 4294967296ULL) {
+            m_data.push_back(value >> 24);
+            m_data.push_back(value >> 16);
+            m_data.push_back(value >> 8);
+            m_data.push_back(value);
+        } else {
+            m_data.push_back(value >> 56);
+            m_data.push_back(value >> 48);
+            m_data.push_back(value >> 40);
+            m_data.push_back(value >> 32);
+            m_data.push_back(value >> 24);
+            m_data.push_back(value >> 16);
+            m_data.push_back(value >> 8);
+            m_data.push_back(value);
+        }
 
 
-        //-(val+1));
 
     }
 
@@ -201,33 +221,53 @@ public:
            value = m_map.size();
        }else if (m_type == CBOR_TYPE_STRING){
            value = m_data.size();
+       }else if (m_type == CBOR_TYPE_UNSIGNED || m_type == CBOR_TYPE_NEGATIVE){
+            if (m_data.size() == 1){
+                if (m_data.at(0) < 24){
+                    data->push_back(majorType | m_data.at(0));
+                }else{
+                    data->push_back(majorType | 24);
+                    data->push_back(m_data.at(0));
+                }
+            }else if (m_data.size() > 1){
+
+                if (m_data.size() == 2) data->push_back(majorType | 25);
+                if (m_data.size() == 4) data->push_back(majorType | 26);
+                if (m_data.size() == 8) data->push_back(majorType | 27);
+
+                for (uint16_t i=0; i<m_data.size(); i++) data->push_back(m_data.at(i));
+            }
        }
 
-       if(value < 24ULL) {
-           data->push_back(majorType | value);
-       } else if(value < 256ULL) {
-           data->push_back(majorType | 24);
-           data->push_back(value);
-       } else if(value < 65536ULL) {
-           data->push_back(majorType | 25);
-           data->push_back(value >> 8);
-       } else if(value < 4294967296ULL) {
-           data->push_back(majorType | 26);
-           data->push_back(value >> 24);
-           data->push_back(value >> 16);
-           data->push_back(value >> 8);
-           data->push_back(value);
-       } else {
-           data->push_back(majorType | 27);
-           data->push_back(value >> 56);
-           data->push_back(value >> 48);
-           data->push_back(value >> 40);
-           data->push_back(value >> 32);
-           data->push_back(value >> 24);
-           data->push_back(value >> 16);
-           data->push_back(value >> 8);
-           data->push_back(value);
+       if (m_type != CBOR_TYPE_UNSIGNED && m_type != CBOR_TYPE_NEGATIVE){
+           if(value < 24ULL) {
+               data->push_back(majorType | value);
+           } else if(value < 256ULL) {
+               data->push_back(majorType | 24);
+               data->push_back(value);
+           } else if(value < 65536ULL) {
+               data->push_back(majorType | 25);
+               data->push_back(value >> 8);
+               data->push_back(value);
+           } else if(value < 4294967296ULL) {
+               data->push_back(majorType | 26);
+               data->push_back(value >> 24);
+               data->push_back(value >> 16);
+               data->push_back(value >> 8);
+               data->push_back(value);
+           } else {
+               data->push_back(majorType | 27);
+               data->push_back(value >> 56);
+               data->push_back(value >> 48);
+               data->push_back(value >> 40);
+               data->push_back(value >> 32);
+               data->push_back(value >> 24);
+               data->push_back(value >> 16);
+               data->push_back(value >> 8);
+               data->push_back(value);
+           }
        }
+
 
        if (m_type == CBOR_TYPE_ARRAY){
            for(uint16_t i=0;i<m_array.size();i++){
@@ -257,10 +297,7 @@ public:
 
 private:
     CborType_t m_type;
-
     vector<uint8_t> m_data;
-
-
     vector<cbor*> m_array;
     vector< pair<cbor*, cbor*> > m_map;
 };
