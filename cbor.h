@@ -24,6 +24,7 @@ class cbor{
 public:
 
     static cbor* parse(vector<uint8_t>* data, uint16_t* p = 0){
+        if(data->size() == 0)return 0;
         uint16_t pointer;
         if (p == 0)
             pointer = 0;

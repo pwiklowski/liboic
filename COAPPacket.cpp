@@ -206,3 +206,13 @@ void COAPPacket::addPayload(uint8_t* payload, uint16_t size){
         m_payload.push_back(*(payload+i));
     }
 }
+
+COAPOption* COAPPacket::getOption(coap_option_num_t option){
+
+    for(int i=0; i<m_options.size(); i++) {
+        if ((*m_options.at(i)).getNumber() == option){
+            return m_options.at(i);
+        }
+    }
+    return 0;
+}

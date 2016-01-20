@@ -121,6 +121,9 @@ public:
     void setToken(uint16_t token){ hdr.tkl = 2; m_token.push_back(token); m_token.push_back(token >> 8); }
     void setMessageId(uint16_t id){hdr.mid = id;}
 
+
+    COAPOption* getOption(coap_option_num_t option);
+
 private:
     coap_header_t hdr;          /* Header of the packet */
     vector<uint8_t> m_token;          /* Token value, size as specified by hdr.tkl */

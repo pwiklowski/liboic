@@ -28,11 +28,13 @@ COAPPacket* COAPServer::handleMessage(COAPPacket* p){
 
     auto endpoint = m_callbacks.find(uri);
     if (endpoint != m_callbacks.end()){
-        bool success = endpoint->second(p, response);
+        bool success = endpoint->second(this, p, response);
         if (!success){
             response->setResonseCode(COAP_RSPCODE_FORBIDDEN);
         }
         return response;
+    }else{
+        response->setResonseCode(COAP_RSPCODE_NOT_FOUND);
     }
     return response;
 }
@@ -42,5 +44,6 @@ void COAPServer::addResource(string url, COAPCallback callback){
     m_callbacks.insert(make_pair(url, callback));
 }
 
-
-
+void COAPServer::addObserver(COAPObserver* observer){
+    m_observers.push_back(observer);
+}
