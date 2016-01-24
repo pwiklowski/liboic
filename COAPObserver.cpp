@@ -4,6 +4,7 @@
 
 COAPObserver::COAPObserver(string address, string href, vector<uint8_t> token)
 {
+    m_number = 5;
     log("New observer ");
 
     m_address = address;

@@ -24,25 +24,44 @@ void COAPServer::handleMessage(COAPPacket* p){
 
     if(p->getHeader()->t == COAP_TYPE_ACK)
     {
-        uint16_t token = p->getToken().at(1) << 8 | p->getToken().at(0);
-        auto endpoint = m_responseHandlers.find(token);
-        if (endpoint != m_responseHandlers.end()){
-            endpoint->second(p);
+        if (p->getHeader()->tkl > 0){
+            uint16_t token = p->getToken().at(1) << 8 | p->getToken().at(0);
+            auto endpoint = m_responseHandlers.find(token);
+            if (endpoint != m_responseHandlers.end()){
+                endpoint->second(p);
+            }
         }
     }
-    else
+    else if (p->getHeader()->t == COAP_TYPE_CON)
     {
         string uri = p->getUri();
         log(uri.c_str());
 
+        COAPPacket* response = new COAPPacket();
         COAPOption* observeOption = p->getOption(COAP_OPTION_OBSERVE);
 
         if (observeOption)
         {
-            m_observers.push_back(new COAPObserver(p->getAddress(), p->getUri(), p->getToken()));
+            uint8_t observe = 0;
+            if (observeOption->getData()->size() > 0)
+                observeOption->getData()->at(0);
+
+            if (observe == 0){
+                COAPObserver* obs = new COAPObserver(p->getAddress(), p->getUri(), p->getToken());
+                m_observers.push_back(obs);
+
+                vector<uint8_t> d;
+                d.push_back(obs->getNumber());
+
+                response->addOption(new COAPOption(COAP_OPTION_OBSERVE, d));
+            }
+            else if (observe == 1){
+                log("TODO remove observers");
+
+            }
+
         }
 
-        COAPPacket* response = new COAPPacket();
         response->setMessageId(p->getHeader()->mid);
 
         vector<uint8_t> t = p->getToken();
