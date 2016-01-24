@@ -23,7 +23,7 @@ public:
 
     void handleMessage(COAPPacket* p);
     void addResource(string url, COAPCallback callback);
-    void addResponseHandler(uint16_t token, COAPResponseHandler handler);
+    void addResponseHandler(uint16_t messageId, COAPResponseHandler handler);
 
     void setIp(string ip){ m_ip = ip; }
     string getIp(){ return m_ip; }

@@ -24,12 +24,12 @@ void COAPServer::handleMessage(COAPPacket* p){
 
     if(p->getHeader()->t == COAP_TYPE_ACK)
     {
-        if (p->getHeader()->tkl > 0){
-            uint16_t token = p->getToken().at(1) << 8 | p->getToken().at(0);
-            auto endpoint = m_responseHandlers.find(token);
-            if (endpoint != m_responseHandlers.end()){
-                endpoint->second(p);
-            }
+        uint16_t messageId = p->getHeader()->mid;
+
+        auto endpoint = m_responseHandlers.find(messageId);
+        if (endpoint != m_responseHandlers.end()){
+            endpoint->second(p);
+            m_responseHandlers.erase(endpoint);
         }
     }
     else if (p->getHeader()->t == COAP_TYPE_CON)
@@ -91,8 +91,8 @@ void COAPServer::addResource(string url, COAPCallback callback){
     m_callbacks.insert(make_pair(url, callback));
 }
 
-void COAPServer::addResponseHandler(uint16_t token, COAPResponseHandler handler){
-    m_responseHandlers.insert(make_pair(token, handler));
+void COAPServer::addResponseHandler(uint16_t messageId, COAPResponseHandler handler){
+    m_responseHandlers.insert(make_pair(messageId, handler));
 }
 
 void COAPServer::notify(string href, vector<uint8_t> data){

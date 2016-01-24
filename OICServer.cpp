@@ -332,6 +332,9 @@ void OICServer::send(sockaddr_in6 destination, COAPPacket* packet, COAPResponseH
 void OICServer::send(sockaddr_in destination, COAPPacket* packet, COAPResponseHandler func){
 #endif
 
+    if (func !=0)
+        coap_server.addResponseHandler(packet->getHeader()->mid, func);
+
     uint8_t buffer[1024];
     size_t response_len;
     socklen_t l = sizeof(destination);
