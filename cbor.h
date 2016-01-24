@@ -35,7 +35,7 @@ public:
         CborType_t majorType = (CborType_t)(type >> 5);
         uint8_t minorType = (unsigned char) (type & 31);
 
-        uint32_t value =0;
+        uint64_t value =0;
         if(minorType < 24) {
             value = minorType;
         } else if(minorType == 24) { // 1 byte
@@ -119,11 +119,13 @@ public:
             m_data.push_back(str.at(i));
     }
 
-    cbor(long long value) {
+    cbor(long long v) {
+        unsigned long long value;
         if (value < 0){
             m_type = CBOR_TYPE_NEGATIVE;
             value = -(value+1);
         } else{
+            value = v;
             m_type = CBOR_TYPE_UNSIGNED;
         }
 

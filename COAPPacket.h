@@ -94,7 +94,7 @@ typedef enum
 class COAPPacket
 {
 public:
-    COAPPacket(uint8_t *data, size_t len);
+    COAPPacket(uint8_t *data, size_t len, string address);
     COAPPacket();
 
     std::string getUri();
@@ -119,6 +119,7 @@ public:
     void setAddress(string address) { m_address = address;}
 
     void setToken(uint16_t token){ hdr.tkl = 2; m_token.push_back(token); m_token.push_back(token >> 8); }
+    void setToken(vector<uint8_t> token){ hdr.tkl = token.size(); m_token = token; }
     void setMessageId(uint16_t id){hdr.mid = id;}
 
 

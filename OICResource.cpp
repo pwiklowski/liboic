@@ -14,8 +14,22 @@ OICResource::~OICResource()
 
 }
 
-void OICResource::update(cbor* value) {
+void OICResource::update(cbor* value, bool notify) {
     delete m_value;
     m_value = value;
-    if (m_onUpdate != 0) m_onUpdate(m_value);
+
+    for(uint16_t i;i<m_observers.size();i++)
+    {
+        m_observers.at(i)->notify();
+    }
+
+    if (notify){
+        if (m_onUpdate != 0)
+            m_onUpdate(m_value);
+    }
+
+}
+
+void OICResource::addObserver(COAPObserver* observer){
+    m_observers.push_back(observer);
 }

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-COAPPacket::COAPPacket(uint8_t* data, size_t len)
+COAPPacket::COAPPacket(uint8_t* data, size_t len, string address)
 {
     if (!parseHeader(&hdr, data, len))
         return;
@@ -28,6 +28,8 @@ COAPPacket::COAPPacket(uint8_t* data, size_t len)
         printf("    num %d\n", (*m_options.at(i)).getNumber());
         printf("    len %d\n", (*m_options.at(i)).getData()->size());
     }
+    m_address = address;
+
 
 }
 bool COAPPacket::parseHeader(coap_header_t *hdr, const uint8_t *buf, size_t buflen)
