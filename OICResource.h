@@ -15,7 +15,7 @@ using namespace std;
 class OICResource
 {
 public:
-    OICResource(string href, string rt, string iff, function<void(cbor *)> onUpdate);
+    OICResource(string href, string rt, string iff, function<void(cbor *)> onUpdate, cbor *initial);
     ~OICResource();
 
     void setCoapServer(COAPServer* s){ m_coapServer = s; }
