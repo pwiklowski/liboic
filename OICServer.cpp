@@ -25,7 +25,7 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
         cbor* device = new cbor(CBOR_TYPE_MAP);
 
         device->append(new cbor("di"), new cbor("0685B960-736F-46F7-BEC0-9E6CBD61ADC1"));
-        device->append(new cbor("n"), new cbor("OIC Sample Device"));
+        device->append(new cbor("n"), new cbor(m_name));
 
         cbor* links = cbor::array();
 
@@ -60,6 +60,7 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
     return false;
 
 }
+
 bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* response){
     response->setType(COAP_TYPE_ACK);
 
@@ -96,14 +97,6 @@ bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* r
     return false;
 
 }
-
-OICServer::OICServer():
-    coap_server([&](string dest, COAPPacket* packet, COAPResponseHandler handler){
-        this->send(dest, packet, handler);
-    })
-{
-
-}
 void OICServer::start(string ip, string interface){
 
     coap_server.setInterface(interface);
@@ -126,73 +119,6 @@ void OICServer::start(string ip, string interface){
 #ifdef IPV6
     pthread_create(&m_discoveryThread, NULL, &OICServer::runDiscovery, this);
 #endif
-}
-
-void OICServer::stop(){
-    pthread_join(m_thread, NULL);
-}
-
-void* OICServer::run(void* param){
-    OICServer* oic_server = (OICServer*) param;
-    COAPServer* coap_server = oic_server->getCoapServer();
-
-
-    const int on = 1;
-#ifdef IPV6
-    int fd = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-    struct sockaddr_in6 serv, client;
-    serv.sin6_family = AF_INET6;
-    serv.sin6_port = htons(5683);
-    serv.sin6_scope_id = if_nametoindex(coap_server->getInterface().c_str());
-
-    if (inet_pton(AF_INET6, coap_server->getIp().c_str(), &(serv.sin6_addr)) < 0){
-        log("Unable to bind");
-        return 0;
-    }
-#endif
-
-
-#ifdef IPV4
-    int fd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-    struct sockaddr_in serv,client;
-    struct ip_mreq mreq;
-
-    serv.sin_family = AF_INET;
-    serv.sin_port = htons(5683);
-    serv.sin_addr.s_addr = htonl(INADDR_ANY);
-
-
-    mreq.imr_multiaddr.s_addr=inet_addr("224.0.1.187");
-    mreq.imr_interface.s_addr=htonl(INADDR_ANY);
-    if (setsockopt(fd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
-        return 0;
-    }
-#endif
-
-    oic_server->setSocketFd(fd);
-
-    uint8_t buffer[1024];
-    socklen_t l = sizeof(client);
-    if(setsockopt(oic_server->getSocketFd(), SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
-    {
-        log("Unable to set reuse");
-        return 0;
-    }
-    if( bind(oic_server->getSocketFd(), (struct sockaddr*)&serv, sizeof(serv) ) == -1)
-    {
-        log("Unable to bind");
-        return 0;
-    }
-
-    while(1){
-        size_t rc= recvfrom(oic_server->getSocketFd(),buffer,sizeof(buffer),0,(struct sockaddr *)&client,&l);
-        if(rc<0)
-        {
-            std::cout<<"ERROR READING FROM SOCKET";
-        }
-        COAPPacket* p = new COAPPacket(buffer, rc, oic_server->convertAddress(client));
-        coap_server->handleMessage(p);
-    }
 }
 
 #ifdef IPV6
@@ -249,41 +175,6 @@ void* OICServer::runDiscovery(void* param){
 #endif
 
 
-#ifdef IPV6
-string OICServer::convertAddress(sockaddr_in6 addr){
-    string port = to_string(htons(addr.sin6_port));
-    char a[30];
-
-    if (inet_ntop(AF_INET6, (sockaddr_in6*)&addr.sin6_addr, a, 30) == 0){
-        log("Unable to bind");
-        return 0;
-    }
-
-    string address(a);
-    address += ' ';
-    address += port;
-    return address;
-}
-#endif
-
-
-#ifdef IPV4
-string OICServer::convertAddress(sockaddr_in addr){
-    string port = to_string(htons(addr.sin_port));
-    char a[30];
-
-    if (inet_ntop(AF_INET, (sockaddr_in*)&addr.sin_addr, a, 30) == 0){
-        log("Unable to bind");
-        return 0;
-    }
-
-    string address(a);
-    address += ' ';
-    address += port;
-    return address;
-}
-#endif
-
 OICResource* OICServer::getResource(string href){
     for(uint16_t i=0; i<m_resources.size();i++){
         if (m_resources.at(i)->getHref() == href) return m_resources.at(i);
@@ -291,53 +182,3 @@ OICResource* OICServer::getResource(string href){
     return 0;
 }
 
-
-
-void OICServer::send(string destination, COAPPacket* packet, COAPResponseHandler func){
-    std::size_t pos = destination.find(" ");
-    string ip = destination.substr(0, pos);
-    uint16_t port = atoi(destination.substr(pos).c_str());
-
-#ifdef IPV6
-
-    struct sockaddr_in6 client;
-    client.sin6_family = AF_INET6;
-    client.sin6_port = htons(port);
-    client.sin6_scope_id = if_nametoindex(coap_server.getInterface().c_str());
-
-    if (inet_pton(AF_INET6, ip.c_str(), &(client.sin6_addr)) < 0){
-        log("err");
-    }
-#endif
-
-#ifdef IPV4
-
-    struct sockaddr_in client;
-    client.sin_family = AF_INET;
-    client.sin_port = htons(port);
-
-    if (inet_pton(AF_INET, ip.c_str(), &(client.sin_addr)) < 0){
-        log("err");
-    }
-#endif
-
-
-    send(client, packet, func);
-}
-#ifdef IPV6
-void OICServer::send(sockaddr_in6 destination, COAPPacket* packet, COAPResponseHandler func){
-#endif
-
-#ifdef IPV4
-void OICServer::send(sockaddr_in destination, COAPPacket* packet, COAPResponseHandler func){
-#endif
-
-    if (func !=0)
-        coap_server.addResponseHandler(packet->getHeader()->mid, func);
-
-    uint8_t buffer[1024];
-    size_t response_len;
-    socklen_t l = sizeof(destination);
-    packet->build(buffer, &response_len);
-    sendto(m_socketFd, buffer, response_len, 0, (struct sockaddr*)&destination, l);
-}

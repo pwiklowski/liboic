@@ -125,11 +125,8 @@ void COAPServer::notify(string href, vector<uint8_t> data){
             content_type.push_back(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF));
 
             p->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, content_type));
-
             p->addPayload(data);
-
             m_sender(o->getAddress(), p, 0);
-
         }
     }
 }
