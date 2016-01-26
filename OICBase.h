@@ -1,5 +1,5 @@
-#ifndef OICDEVICE_H
-#define OICDEVICE_H
+#ifndef OICBASE_H
+#define OICBASE_H
 
 #include "pthread.h"
 #include <stdint.h>
@@ -17,10 +17,10 @@ typedef void(*OICServerSendData)(uint8_t*, uint16_t);
 class OICResource;
 
 
-class OICDevice
+class OICBase
 {
 public:
-    OICDevice(string name);
+    OICBase(string name);
 
     void start(string ip, string interface);
     void stop();

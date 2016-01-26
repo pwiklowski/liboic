@@ -1,4 +1,4 @@
-#include "OICDevice.h"
+#include "OICBase.h"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -14,31 +14,31 @@
 #include "COAPObserver.h"
 
 
-OICDevice::OICDevice(string name):
+OICBase::OICBase(string name):
     coap_server([&](string dest, COAPPacket* packet, COAPResponseHandler handler){
         this->send(dest, packet, handler);
     })
 {
     m_name = name;
 }
-void OICDevice::start(string ip, string interface){
+void OICBase::start(string ip, string interface){
 
     coap_server.setInterface(interface);
     coap_server.setIp(ip);
 
-    pthread_create(&m_thread, NULL, &OICDevice::run, this);
+    pthread_create(&m_thread, NULL, &OICBase::run, this);
 
 #ifdef IPV6
-    pthread_create(&m_discoveryThread, NULL, &OICDevice::runDiscovery, this);
+    pthread_create(&m_discoveryThread, NULL, &OICBase::runDiscovery, this);
 #endif
 }
 
-void OICDevice::stop(){
+void OICBase::stop(){
     pthread_join(m_thread, NULL);
 }
 
-void* OICDevice::run(void* param){
-    OICDevice* oic_server = (OICDevice*) param;
+void* OICBase::run(void* param){
+    OICBase* oic_server = (OICBase*) param;
     COAPServer* coap_server = oic_server->getCoapServer();
 
 
@@ -101,7 +101,7 @@ void* OICDevice::run(void* param){
 }
 
 #ifdef IPV6
-string OICDevice::convertAddress(sockaddr_in6 addr){
+string OICBase::convertAddress(sockaddr_in6 addr){
     string port = to_string(htons(addr.sin6_port));
     char a[30];
 
@@ -119,7 +119,7 @@ string OICDevice::convertAddress(sockaddr_in6 addr){
 
 
 #ifdef IPV4
-string OICDevice::convertAddress(sockaddr_in addr){
+string OICBase::convertAddress(sockaddr_in addr){
     string port = to_string(htons(addr.sin_port));
     char a[30];
 
@@ -135,7 +135,7 @@ string OICDevice::convertAddress(sockaddr_in addr){
 }
 #endif
 
-void OICDevice::send(string destination, COAPPacket* packet, COAPResponseHandler func){
+void OICBase::send(string destination, COAPPacket* packet, COAPResponseHandler func){
     std::size_t pos = destination.find(" ");
     string ip = destination.substr(0, pos);
     uint16_t port = atoi(destination.substr(pos).c_str());
@@ -167,11 +167,11 @@ void OICDevice::send(string destination, COAPPacket* packet, COAPResponseHandler
     send(client, packet, func);
 }
 #ifdef IPV6
-void OICDevice::send(sockaddr_in6 destination, COAPPacket* packet, COAPResponseHandler func){
+void OICBase::send(sockaddr_in6 destination, COAPPacket* packet, COAPResponseHandler func){
 #endif
 
 #ifdef IPV4
-void OICDevice::send(sockaddr_in destination, COAPPacket* packet, COAPResponseHandler func){
+void OICBase::send(sockaddr_in destination, COAPPacket* packet, COAPResponseHandler func){
 #endif
 
     if (func !=0)

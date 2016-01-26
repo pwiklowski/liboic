@@ -1,12 +1,12 @@
 #ifndef OICSERVER_H
 #define OICSERVER_H
 
-#include "OICDevice.h"
+#include "OICBase.h"
 
-class OICServer : public OICDevice
+class OICServer : public OICBase
 {
 public:
-    OICServer(string name):OICDevice(name){}
+    OICServer(string name):OICBase(name){}
     void start(string ip, string interface);
     void addResource(OICResource* res) {res->setCoapServer(&coap_server); m_resources.push_back(res);}
 private:
