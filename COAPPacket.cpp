@@ -192,6 +192,19 @@ string COAPPacket::getUri(){
 }
 
 
+void COAPPacket::parseUri(COAPPacket* p, string uri){
+    size_t start = 1;
+    int end;
+
+    while((end = uri.find("/" , start)) != -1){
+        p->addOption(new COAPOption(COAP_OPTION_URI_PATH, (char*) uri.substr(start, end-start).c_str()));
+        start = end +1;
+    }
+    p->addOption(new COAPOption(COAP_OPTION_URI_PATH, (char*) uri.substr(start, uri.size()).c_str()));
+}
+
+
+
 COAPPacket::COAPPacket(){
     hdr.ver = 0x01;
     hdr.t = COAP_TYPE_ACK;

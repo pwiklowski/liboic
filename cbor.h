@@ -337,6 +337,20 @@ public:
     {
         return true;
     }
+    bool is_string(){
+        if (m_type == CBOR_TYPE_STRING)
+            return true;
+        else
+            return false;
+
+    }
+
+    bool is_int(){
+        if (m_type == CBOR_TYPE_NEGATIVE || m_type == CBOR_TYPE_UNSIGNED)
+            return true;
+        else
+            return false;
+    }
 
 private:
     CborType_t m_type;

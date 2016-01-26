@@ -125,6 +125,7 @@ public:
 
     COAPOption* getOption(coap_option_num_t option);
 
+    static void parseUri(COAPPacket* p, string uri);
 private:
     coap_header_t hdr;          /* Header of the packet */
     vector<uint8_t> m_token;          /* Token value, size as specified by hdr.tkl */
