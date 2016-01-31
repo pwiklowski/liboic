@@ -29,6 +29,15 @@ void COAPServer::handleMessage(COAPPacket* p){
         auto endpoint = m_responseHandlers.find(messageId);
         if (endpoint != m_responseHandlers.end()){
             endpoint->second(p);
+
+
+            COAPOption* observeOption = p->getOption(COAP_OPTION_OBSERVE);
+
+            if (observeOption !=0){
+                COAPObserver* obs = new COAPObserver(p->getAddress(), p->getUri(), p->getToken(), endpoint->second);
+                m_observers.push_back(obs);
+            }
+
             m_responseHandlers.erase(endpoint);
         }
     }
@@ -40,11 +49,21 @@ void COAPServer::handleMessage(COAPPacket* p){
         COAPPacket* response = new COAPPacket();
         COAPOption* observeOption = p->getOption(COAP_OPTION_OBSERVE);
 
+        response->setAddress(p->getAddress());
+        response->setMessageId(p->getHeader()->mid);
+
+        vector<uint8_t> t = p->getToken();
+
+        if (t.size() == 2){
+            uint16_t token = t.at(1) << 8 | t.at(0);
+            response->setToken(token);
+        }
+
         if (observeOption)
         {
             uint8_t observe = 0;
             if (observeOption->getData()->size() > 0)
-                observeOption->getData()->at(0);
+                observe = observeOption->getData()->at(0);
 
             if (observe == 0){
                 COAPObserver* obs = new COAPObserver(p->getAddress(), p->getUri(), p->getToken());
@@ -59,18 +78,19 @@ void COAPServer::handleMessage(COAPPacket* p){
                 log("TODO remove observers");
 
             }
-
+            else{
+                for(COAPObserver* o: m_observers) {
+                    if (o->getToken() == p->getToken()){
+                        o->handle(p);
+                        m_sender(response, 0);
+                        return;
+                    }
+                }
+                response->setResonseCode(COAP_RSPCODE_NOT_FOUND);
+                m_sender(response, 0);
+                return;
+            }
         }
-
-        response->setMessageId(p->getHeader()->mid);
-
-        vector<uint8_t> t = p->getToken();
-
-        if (t.size() == 2){
-            uint16_t token = t.at(1) << 8 | t.at(0);
-            response->setToken(token);
-        }
-
 
         auto endpoint = m_callbacks.find(uri);
         if (endpoint != m_callbacks.end()){
@@ -82,7 +102,7 @@ void COAPServer::handleMessage(COAPPacket* p){
             response->setResonseCode(COAP_RSPCODE_NOT_FOUND);
         }
 
-        m_sender(p->getAddress(), response, 0);
+        m_sender(response, 0);
     }
 }
 
@@ -126,7 +146,7 @@ void COAPServer::notify(string href, vector<uint8_t> data){
 
             p->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, content_type));
             p->addPayload(data);
-            m_sender(o->getAddress(), p, 0);
+            m_sender(p, 0);
         }
     }
 }

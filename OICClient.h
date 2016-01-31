@@ -9,10 +9,9 @@ class OICClient : public OICBase
 public:
     OICClient();
 
-    void searchDevices();
+    void searchDevices(COAPResponseHandler handler);
 
 private:
-    vector<OICDevice*> m_devices;
 
 };
 

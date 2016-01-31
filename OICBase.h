@@ -25,7 +25,7 @@ public:
     void start(string ip, string interface);
     void stop();
 
-    void send(string destination, COAPPacket* packet, COAPResponseHandler func);
+    void send(COAPPacket* packet, COAPResponseHandler func);
 #ifdef IPV6
 void send(sockaddr_in6 destination, COAPPacket* packet, COAPResponseHandler func);
 #endif
@@ -38,6 +38,8 @@ void send(sockaddr_in destination, COAPPacket* packet, COAPResponseHandler func)
 
     int  getSocketFd() { return m_socketFd; }
     void setSocketFd(int socket) { m_socketFd = socket; }
+
+    bool isClient() { return m_is_client; }
 protected:
 
 #ifdef IPV6
@@ -57,6 +59,8 @@ protected:
     COAPServer coap_server;
     int m_socketFd;
     string m_name;
+    bool m_is_client;
+    uint16_t m_id;
 };
 
 #endif // OICSERVER_H

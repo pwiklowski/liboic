@@ -3,6 +3,9 @@
 
 #include <string>
 #include <vector>
+#include "COAPPacket.h"
+#include "COAPServer.h"
+
 
 using namespace std;
 
@@ -17,6 +20,12 @@ public:
     vector<OICDeviceResource*>* getResources() { return &m_resources;}
 
     string getAddress() { return m_address; }
+
+    string getId() { return m_id; }
+    string getName() { return m_name;}
+
+    void send(COAPPacket* packet, COAPResponseHandler func);
+
 private:
     string m_id;
     string m_name;

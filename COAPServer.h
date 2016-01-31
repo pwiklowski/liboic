@@ -13,7 +13,7 @@ class COAPObserver;
 
 typedef std::function<void(COAPPacket*)> COAPResponseHandler;
 typedef std::function<bool(COAPServer*, COAPPacket*, COAPPacket*)> COAPCallback;
-typedef std::function<void(string dest, COAPPacket* packet, COAPResponseHandler func)> COAPSend;
+typedef std::function<void(COAPPacket* packet, COAPResponseHandler func)> COAPSend;
 
 
 class COAPServer

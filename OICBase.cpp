@@ -15,11 +15,12 @@
 
 
 OICBase::OICBase(string name):
-    coap_server([&](string dest, COAPPacket* packet, COAPResponseHandler handler){
-        this->send(dest, packet, handler);
+    coap_server([&](COAPPacket* packet, COAPResponseHandler handler){
+        this->send(packet, handler);
     })
 {
     m_name = name;
+    m_is_client = false;
 }
 void OICBase::start(string ip, string interface){
 
@@ -63,14 +64,18 @@ void* OICBase::run(void* param){
     struct ip_mreq mreq;
 
     serv.sin_family = AF_INET;
-    serv.sin_port = htons(5683);
+    if (oic_server->isClient())
+        serv.sin_port = 0;
+    else
+        serv.sin_port = htons(5683);
     serv.sin_addr.s_addr = htonl(INADDR_ANY);
 
-
-    mreq.imr_multiaddr.s_addr=inet_addr("224.0.1.187");
-    mreq.imr_interface.s_addr=htonl(INADDR_ANY);
-    if (setsockopt(fd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
-        return 0;
+    if (!oic_server->isClient()){
+        mreq.imr_multiaddr.s_addr=inet_addr("224.0.1.187");
+        mreq.imr_interface.s_addr=htonl(INADDR_ANY);
+        if (setsockopt(fd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
+            return 0;
+        }
     }
 #endif
 
@@ -135,7 +140,8 @@ string OICBase::convertAddress(sockaddr_in addr){
 }
 #endif
 
-void OICBase::send(string destination, COAPPacket* packet, COAPResponseHandler func){
+void OICBase::send(COAPPacket* packet, COAPResponseHandler func){
+    string destination = packet->getAddress();
     std::size_t pos = destination.find(" ");
     string ip = destination.substr(0, pos);
     uint16_t port = atoi(destination.substr(pos).c_str());
@@ -162,7 +168,8 @@ void OICBase::send(string destination, COAPPacket* packet, COAPResponseHandler f
         log("err");
     }
 #endif
-
+    if (packet->getHeader()->mid !=0)
+        packet->getHeader()->mid = m_id++;
 
     send(client, packet, func);
 }

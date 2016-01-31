@@ -16,6 +16,9 @@ class OICDeviceResource
 public:
     OICDeviceResource(string href, string interface, string resourceType, OICDevice* device, OICClient* client);
 
+    string getHref() { return m_href;}
+    string getResourceType() { return m_resourceType; }
+    string getInterface() { return m_interface; }
 
     void post(cbor *value, COAPResponseHandler handler);
     void get(COAPResponseHandler handler);
@@ -24,6 +27,9 @@ private:
     OICDevice* m_device;
     OICClient* m_client;
     string m_href;
+    string m_interface;
+    string m_resourceType;
+
 };
 
 #endif // OICDEVICERESOURCE_H

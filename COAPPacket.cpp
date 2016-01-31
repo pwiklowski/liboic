@@ -208,6 +208,9 @@ void COAPPacket::parseUri(COAPPacket* p, string uri){
 COAPPacket::COAPPacket(){
     hdr.ver = 0x01;
     hdr.t = COAP_TYPE_ACK;
+    hdr.tkl = 0;
+    hdr.code= 0;
+    hdr.mid =0;
 }
 
 void COAPPacket::addPayload(string payload){
