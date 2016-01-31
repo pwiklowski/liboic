@@ -38,10 +38,7 @@ void OICDeviceResource::get(COAPResponseHandler handler){
     p->setAddress(m_device->getAddress());
 
     COAPPacket::parseUri(p, m_href);
-
     m_client->send(p, handler);
-
-
 }
 
 void OICDeviceResource::observe(COAPResponseHandler handler){

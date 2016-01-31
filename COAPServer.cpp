@@ -30,21 +30,20 @@ void COAPServer::handleMessage(COAPPacket* p){
         if (endpoint != m_responseHandlers.end()){
             endpoint->second(p);
 
-
             COAPOption* observeOption = p->getOption(COAP_OPTION_OBSERVE);
 
             if (observeOption !=0){
                 COAPObserver* obs = new COAPObserver(p->getAddress(), p->getUri(), p->getToken(), endpoint->second);
                 m_observers.push_back(obs);
             }
-
+            log("Remove response handler %d\n", messageId);
             m_responseHandlers.erase(endpoint);
         }
     }
     else if (p->getHeader()->t == COAP_TYPE_CON)
     {
         string uri = p->getUri();
-        log(uri.c_str());
+        log("handle request %s\n", uri.c_str());
 
         COAPPacket* response = new COAPPacket();
         COAPOption* observeOption = p->getOption(COAP_OPTION_OBSERVE);
@@ -82,6 +81,7 @@ void COAPServer::handleMessage(COAPPacket* p){
                 for(COAPObserver* o: m_observers) {
                     if (o->getToken() == p->getToken()){
                         o->handle(p);
+                        log("notify from server received %s %s\n", o->getAddress().c_str(), o->getHref().c_str());
                         m_sender(response, 0);
                         return;
                     }
@@ -118,6 +118,8 @@ void COAPServer::addResponseHandler(uint16_t messageId, COAPResponseHandler hand
 void COAPServer::notify(string href, vector<uint8_t> data){
     for(uint16_t i=0; i<m_observers.size(); i++){
         COAPObserver* o = m_observers.at(i);
+
+
 
         if (href == o->getHref()){
             COAPPacket* p = new COAPPacket();

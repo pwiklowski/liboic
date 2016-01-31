@@ -1,7 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#define log(line) fprintf(stderr, "%s:%d [%s]: %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, line)
+#define log(line, ...) fprintf(stderr, line, ## __VA_ARGS__ )
 
 
 #endif // LOG_H

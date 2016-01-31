@@ -1,8 +1,16 @@
 #include "COAPPacket.h"
 #include <cstdio>
 #include  <cstring>
+#include "log.h"
+
+
+#define packet_log(line, ...) //log(line, ## __VA_ARGS__ )
 
 using namespace std;
+
+
+
+
 
 COAPPacket::COAPPacket(uint8_t* data, size_t len, string address)
 {
@@ -14,19 +22,19 @@ COAPPacket::COAPPacket(uint8_t* data, size_t len, string address)
         return;
 
 
-    printf("Header:\n");
-    printf("  ver  0x%02X\n", hdr.ver);
-    printf("  t    0x%02X\n", hdr.t);
-    printf("  tkl  0x%02X\n", hdr.tkl);
-    printf("  code 0x%02X\n", hdr.code);
-    printf("  id   0x%02X\n", hdr.mid);
+    packet_log("Header:\n");
+    packet_log("  ver  0x%02X\n", hdr.ver);
+    packet_log("  t    0x%02X\n", hdr.t);
+    packet_log("  tkl  0x%02X\n", hdr.tkl);
+    packet_log("  code 0x%02X\n", hdr.code);
+    packet_log("  id   0x%02X\n", hdr.mid);
 
 
     for(int i=0; i<m_options.size(); i++)
     {
-        printf("option %d\n", i);
-        printf("    num %d\n", (*m_options.at(i)).getNumber());
-        printf("    len %d\n", (*m_options.at(i)).getData()->size());
+        packet_log("option %d\n", i);
+        packet_log("    num %d\n", (*m_options.at(i)).getNumber());
+        packet_log("    len %d\n", (*m_options.at(i)).getData()->size());
     }
     m_address = address;
 
@@ -178,7 +186,7 @@ int COAPPacket::build(uint8_t *buf, size_t *buflen)
 string COAPPacket::getUri(){
     string uri;
     for(int i=0; i<m_options.size(); i++) {
-        printf("option %d\n", i);
+        packet_log("option %d\n", i);
         if ((*m_options.at(i)).getNumber() == COAP_OPTION_URI_PATH){
             uri.append("/");
             vector<uint8_t>* data = (*m_options.at(i)).getData();
