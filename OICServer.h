@@ -14,9 +14,7 @@ private:
     bool onRequest(COAPServer* server, COAPPacket* request, COAPPacket* response);
     bool discoveryRequest(COAPServer* server, COAPPacket* request, COAPPacket* response);
     OICResource* getResource(string href);
-#ifdef IPV6
     pthread_t m_discoveryThread;
-#endif
     vector<OICResource*> m_resources;
 };
 

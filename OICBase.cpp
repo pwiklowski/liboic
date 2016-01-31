@@ -48,7 +48,7 @@ void* OICBase::run(void* param){
     int fd = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     struct sockaddr_in6 serv, client;
     serv.sin6_family = AF_INET6;
-    serv.sin6_port = htons(5683);
+    serv.sin6_port = 0;
     serv.sin6_scope_id = if_nametoindex(coap_server->getInterface().c_str());
 
     if (inet_pton(AF_INET6, coap_server->getIp().c_str(), &(serv.sin6_addr)) < 0){
@@ -64,19 +64,8 @@ void* OICBase::run(void* param){
     struct ip_mreq mreq;
 
     serv.sin_family = AF_INET;
-    if (oic_server->isClient())
-        serv.sin_port = 0;
-    else
-        serv.sin_port = htons(5683);
+    serv.sin_port = 0;
     serv.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    if (!oic_server->isClient()){
-        mreq.imr_multiaddr.s_addr=inet_addr("224.0.1.187");
-        mreq.imr_interface.s_addr=htonl(INADDR_ANY);
-        if (setsockopt(fd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
-            return 0;
-        }
-    }
 #endif
 
     oic_server->setSocketFd(fd);
