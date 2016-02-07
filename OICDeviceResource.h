@@ -2,7 +2,7 @@
 #define OICDEVICERESOURCE_H
 
 #include "OICDevice.h"
-#include <string>
+#include "String.h"
 #include "COAPServer.h"
 #include "cbor.h"
 #include "OICClient.h"
@@ -14,11 +14,11 @@ class OICDevice;
 class OICDeviceResource
 {
 public:
-    OICDeviceResource(string href, string interface, string resourceType, OICDevice* device, OICClient* client);
+    OICDeviceResource(String href, String interface, String resourceType, OICDevice* device, OICClient* client);
 
-    string getHref() { return m_href;}
-    string getResourceType() { return m_resourceType; }
-    string getInterface() { return m_interface; }
+    String getHref() { return m_href;}
+    String getResourceType() { return m_resourceType; }
+    String getInterface() { return m_interface; }
 
     void post(cbor *value, COAPResponseHandler handler);
     void get(COAPResponseHandler handler);
@@ -26,9 +26,9 @@ public:
 private:
     OICDevice* m_device;
     OICClient* m_client;
-    string m_href;
-    string m_interface;
-    string m_resourceType;
+    String m_href;
+    String m_interface;
+    String m_resourceType;
 
 };
 

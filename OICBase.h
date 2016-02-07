@@ -20,9 +20,9 @@ class OICResource;
 class OICBase
 {
 public:
-    OICBase(string name);
+    OICBase(String name);
 
-    void start(string ip, string interface);
+    void start(String ip, String interface);
     void stop();
 
     void send(COAPPacket* packet, COAPResponseHandler func);
@@ -43,22 +43,22 @@ void send(sockaddr_in destination, COAPPacket* packet, COAPResponseHandler func)
 protected:
 
 #ifdef IPV6
-    string convertAddress(sockaddr_in6 addr);
+    String convertAddress(sockaddr_in6 addr);
 #endif
 
 #ifdef IPV4
-    string convertAddress(sockaddr_in addr);
+    String convertAddress(sockaddr_in addr);
 #endif
     static void* run(void*param);
 
-    OICResource* getResource(string href);
+    OICResource* getResource(String href);
 
     pthread_t m_thread;
 
     uint8_t buffer[1024];
     COAPServer coap_server;
     int m_socketFd;
-    string m_name;
+    String m_name;
     bool m_is_client;
     uint16_t m_id;
 };

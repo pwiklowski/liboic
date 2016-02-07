@@ -5,11 +5,10 @@
 #include <arpa/inet.h>
 #include <iostream>
 #include "log.h"
-#include <string>
 #include "cbor.h"
 #include <netdb.h>
 #include <stdio.h>
-#include <string.h>
+#include "String.h"
 #include <net/if.h>
 #include "COAPObserver.h"
 
@@ -19,7 +18,7 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
     if (request->getHeader()->code == COAP_METHOD_GET){
         response->setResonseCode(COAP_RSPCODE_CONTENT);
 
-        vector<uint8_t> p;
+        List<uint8_t> p;
 
         cbor* root = new cbor(CBOR_TYPE_ARRAY);
         cbor* device = new cbor(CBOR_TYPE_MAP);
@@ -48,9 +47,9 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
 
         delete root;
 
-        vector<uint8_t> data;
-        data.push_back(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF00) >> 8);
-        data.push_back(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF));
+        List<uint8_t> data;
+        data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF00) >> 8);
+        data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF));
 
         response->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, data));
         response->addPayload(p);
@@ -73,9 +72,9 @@ bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* r
             resource->value()->dump(response->getPayload());
         }
 
-        vector<uint8_t> data;
-        data.push_back(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF00) >> 8);
-        data.push_back(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF));
+        List<uint8_t> data;
+        data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF00) >> 8);
+        data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF));
 
         response->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, data));
 
@@ -97,7 +96,7 @@ bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* r
     return false;
 
 }
-void OICServer::start(string ip, string interface){
+void OICServer::start(String ip, String interface){
 
     coap_server.setInterface(interface);
     coap_server.setIp(ip);
@@ -198,7 +197,7 @@ void* OICServer::runDiscovery(void* param){
 }
 
 
-OICResource* OICServer::getResource(string href){
+OICResource* OICServer::getResource(String href){
     for(uint16_t i=0; i<m_resources.size();i++){
         if (m_resources.at(i)->getHref() == href) return m_resources.at(i);
     }

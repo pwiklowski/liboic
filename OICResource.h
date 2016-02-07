@@ -2,7 +2,7 @@
 #define OICRESOURCE_H
 
 
-#include <string>
+#include "String.h"
 #include "COAPServer.h"
 #include <functional>
 #include <iostream>
@@ -15,14 +15,14 @@ using namespace std;
 class OICResource
 {
 public:
-    OICResource(string href, string rt, string iff, function<void(cbor *)> onUpdate, cbor *initial);
+    OICResource(String href, String rt, String iff, function<void(cbor *)> onUpdate, cbor *initial);
     ~OICResource();
 
     void setCoapServer(COAPServer* s){ m_coapServer = s; }
 
-    string getHref(){ return m_href; }
-    string getResourceType(){ return m_rt; }
-    string getInterface(){ return m_if; }
+    String getHref(){ return m_href; }
+    String getResourceType(){ return m_rt; }
+    String getInterface(){ return m_if; }
 
     COAPCallback getCallback(){ return m_callback;}
 
@@ -34,9 +34,9 @@ public:
 
     void addObserver(COAPObserver* observer);
 private:
-    string m_href;
-    string m_rt;
-    string m_if;
+    String m_href;
+    String m_rt;
+    String m_if;
     COAPCallback m_callback;
     COAPServer* m_coapServer;
 

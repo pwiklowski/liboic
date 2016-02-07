@@ -2,7 +2,7 @@
 #include "OICDeviceResource.h"
 #include "log.h"
 
-OICDevice::OICDevice(string id, string name, string address, OICClient *client)
+OICDevice::OICDevice(String id, String name, String address, OICClient *client)
 {
     log("New device id:'%s' name:'%s' addr:'%s'\n", id.c_str(), name.c_str(), address.c_str());
     m_id = id;

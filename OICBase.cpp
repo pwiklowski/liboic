@@ -5,16 +5,15 @@
 #include <arpa/inet.h>
 #include <iostream>
 #include "log.h"
-#include <string>
 #include "cbor.h"
 #include <netdb.h>
 #include <stdio.h>
-#include <string.h>
+#include "String.h"
 #include <net/if.h>
 #include "COAPObserver.h"
 
 
-OICBase::OICBase(string name):
+OICBase::OICBase(String name):
     coap_server([&](COAPPacket* packet, COAPResponseHandler handler){
         this->send(packet, handler);
     })
@@ -22,7 +21,7 @@ OICBase::OICBase(string name):
     m_name = name;
     m_is_client = false;
 }
-void OICBase::start(string ip, string interface){
+void OICBase::start(String ip, String interface){
 
     coap_server.setInterface(interface);
     coap_server.setIp(ip);
@@ -89,14 +88,14 @@ void* OICBase::run(void* param){
         {
             std::cout<<"ERROR READING FROM SOCKET";
         }
-        COAPPacket* p = new COAPPacket(buffer, rc, oic_server->convertAddress(client));
+        COAPPacket* p = new COAPPacket(buffer, rc, oic_server->convertAddress(client).c_str());
         coap_server->handleMessage(p);
     }
 }
 
 #ifdef IPV6
-string OICBase::convertAddress(sockaddr_in6 addr){
-    string port = to_string(htons(addr.sin6_port));
+String OICBase::convertAddress(sockaddr_in6 addr){
+    String port = to_String(htons(addr.sin6_port));
     char a[30];
 
     if (inet_ntop(AF_INET6, (sockaddr_in6*)&addr.sin6_addr, a, 30) == 0){
@@ -104,7 +103,7 @@ string OICBase::convertAddress(sockaddr_in6 addr){
         return 0;
     }
 
-    string address(a);
+    String address(a);
     address += ' ';
     address += port;
     return address;
@@ -113,8 +112,8 @@ string OICBase::convertAddress(sockaddr_in6 addr){
 
 
 #ifdef IPV4
-string OICBase::convertAddress(sockaddr_in addr){
-    string port = to_string(htons(addr.sin_port));
+String OICBase::convertAddress(sockaddr_in addr){
+    String port = to_string(htons(addr.sin_port)).c_str();
     char a[30];
 
     if (inet_ntop(AF_INET, (sockaddr_in*)&addr.sin_addr, a, 30) == 0){
@@ -122,17 +121,17 @@ string OICBase::convertAddress(sockaddr_in addr){
         return 0;
     }
 
-    string address(a);
-    address += ' ';
-    address += port;
+    String address(a);
+    address.append(' ');
+    address.append(port);
     return address;
 }
 #endif
 
 void OICBase::send(COAPPacket* packet, COAPResponseHandler func){
-    string destination = packet->getAddress();
-    std::size_t pos = destination.find(" ");
-    string ip = destination.substr(0, pos);
+    String destination = packet->getAddress();
+    size_t pos = destination.find(" ");
+    String ip = destination.substr(0, pos);
     uint16_t port = atoi(destination.substr(pos).c_str());
 
 #ifdef IPV6

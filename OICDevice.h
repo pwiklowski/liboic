@@ -1,7 +1,7 @@
 #ifndef OICDEVICE_H
 #define OICDEVICE_H
 
-#include <string>
+#include "String.h"
 #include <vector>
 #include "COAPPacket.h"
 #include "COAPServer.h"
@@ -15,21 +15,21 @@ class OICDeviceResource;
 class OICDevice
 {
 public:
-    OICDevice(string id, string name, string address, OICClient* client);
+    OICDevice(String id, String name, String address, OICClient* client);
 
     vector<OICDeviceResource*>* getResources() { return &m_resources;}
 
-    string getAddress() { return m_address; }
+    String getAddress() { return m_address; }
 
-    string getId() { return m_id; }
-    string getName() { return m_name;}
+    String getId() { return m_id; }
+    String getName() { return m_name;}
 
     void send(COAPPacket* packet, COAPResponseHandler func);
 
 private:
-    string m_id;
-    string m_name;
-    string m_address;
+    String m_id;
+    String m_name;
+    String m_address;
     OICClient* m_client;
     vector<OICDeviceResource*> m_resources;
 };

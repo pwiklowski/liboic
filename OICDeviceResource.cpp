@@ -1,7 +1,7 @@
 #include "OICDeviceResource.h"
 
 
-OICDeviceResource::OICDeviceResource(string href, string interface, string resourceType, OICDevice *device, OICClient *client)
+OICDeviceResource::OICDeviceResource(String href, String interface, String resourceType, OICDevice *device, OICClient *client)
 {
     m_device = device;
     m_client = client;
@@ -22,9 +22,9 @@ void OICDeviceResource::post(cbor* value, COAPResponseHandler handler){
 
     COAPPacket::parseUri(p, m_href);
 
-    vector<uint8_t> data;
-    data.push_back(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF00) >> 8);
-    data.push_back(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF));
+    List<uint8_t> data;
+    data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF00) >> 8);
+    data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF));
 
     p->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, data));
 
@@ -47,7 +47,7 @@ void OICDeviceResource::observe(COAPResponseHandler handler){
     p->setResonseCode(COAP_METHOD_GET);
     p->setAddress(m_device->getAddress());
 
-    vector<uint8_t> data;
+    List<uint8_t> data;
     p->addOption(new COAPOption(COAP_OPTION_OBSERVE, data));
 
     COAPPacket::parseUri(p, m_href);

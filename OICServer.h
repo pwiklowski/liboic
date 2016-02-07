@@ -6,16 +6,16 @@
 class OICServer : public OICBase
 {
 public:
-    OICServer(string name):OICBase(name){}
-    void start(string ip, string interface);
-    void addResource(OICResource* res) {res->setCoapServer(&coap_server); m_resources.push_back(res);}
+    OICServer(String name):OICBase(name){}
+    void start(String ip, String interface);
+    void addResource(OICResource* res) {res->setCoapServer(&coap_server); m_resources.append(res);}
 private:
     static void* runDiscovery(void*param);
     bool onRequest(COAPServer* server, COAPPacket* request, COAPPacket* response);
     bool discoveryRequest(COAPServer* server, COAPPacket* request, COAPPacket* response);
-    OICResource* getResource(string href);
+    OICResource* getResource(String href);
     pthread_t m_discoveryThread;
-    vector<OICResource*> m_resources;
+    List<OICResource*> m_resources;
 };
 
 #endif // OICSERVER_H
