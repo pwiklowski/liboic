@@ -5,8 +5,12 @@
 #include <stdint.h>
 #include "OICResource.h"
 #include "cbor.h"
-#include <netinet/in.h>
 
+#ifdef ESP8266
+#include "lwip/sockets.h"
+#else
+#include <netinet/in.h>
+#endif
 
 #define IPV4
 
@@ -41,7 +45,7 @@ void send(sockaddr_in destination, COAPPacket* packet, COAPResponseHandler func)
 
     bool isClient() { return m_is_client; }
 protected:
-
+    uint16_t getMessageId();
 #ifdef IPV6
     String convertAddress(sockaddr_in6 addr);
 #endif

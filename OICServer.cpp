@@ -15,7 +15,7 @@
 
 bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPacket* response){
     response->setType(COAP_TYPE_ACK);
-    if (request->getHeader()->code == COAP_METHOD_GET){
+    if (request->getCode() == COAP_METHOD_GET){
         response->setResonseCode(COAP_RSPCODE_CONTENT);
 
         List<uint8_t> p;
@@ -53,6 +53,7 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
 
         response->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, data));
         response->addPayload(p);
+        response->setMessageId(request->getMessageId());
 
         return true;
     }
@@ -64,7 +65,7 @@ bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* r
     response->setType(COAP_TYPE_ACK);
 
     OICResource* resource = getResource(request->getUri());
-    if (request->getHeader()->code == COAP_METHOD_GET){
+    if (request->getCode() == COAP_METHOD_GET){
         response->setResonseCode(COAP_RSPCODE_CONTENT);
 
 
@@ -80,7 +81,7 @@ bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* r
 
         return true;
 
-    }else if(request->getHeader()->code == COAP_METHOD_POST){
+    }else if(request->getCode() == COAP_METHOD_POST){
         response->setResonseCode(COAP_RSPCODE_CHANGED);
 
         cbor* message = cbor::parse(request->getPayload());

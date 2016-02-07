@@ -15,6 +15,7 @@ void OICClient::searchDevices(COAPResponseHandler handler){
     p->addOption(new COAPOption(COAP_OPTION_URI_PATH, "oic"));
     p->addOption(new COAPOption(COAP_OPTION_URI_PATH, "res"));
 
+    p->setMessageId(0);
     //p->setAddress("ff02::fd 5683");
     p->setAddress("224.0.1.187 5683");
 

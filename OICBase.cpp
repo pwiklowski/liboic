@@ -20,6 +20,7 @@ OICBase::OICBase(String name):
 {
     m_name = name;
     m_is_client = false;
+    m_id = 1;
 }
 void OICBase::start(String ip, String interface){
 
@@ -156,9 +157,10 @@ void OICBase::send(COAPPacket* packet, COAPResponseHandler func){
         log("err");
     }
 #endif
-    if (packet->getHeader()->mid !=0)
-        packet->getHeader()->mid = m_id++;
+    if (!packet->isValidMessageId())
+        packet->setMessageId(getMessageId());
 
+    log("Send packet mid=%d destination=%s\n", packet->getMessageId(), destination.c_str());
     send(client, packet, func);
 }
 #ifdef IPV6
@@ -170,11 +172,19 @@ void OICBase::send(sockaddr_in destination, COAPPacket* packet, COAPResponseHand
 #endif
 
     if (func !=0)
-        coap_server.addResponseHandler(packet->getHeader()->mid, func);
+        coap_server.addResponseHandler(packet->getMessageId(), func);
 
     uint8_t buffer[1024];
     size_t response_len;
     socklen_t l = sizeof(destination);
     packet->build(buffer, &response_len);
+
+
     sendto(m_socketFd, buffer, response_len, 0, (struct sockaddr*)&destination, l);
+}
+
+uint16_t OICBase::getMessageId(){
+    m_id++;
+    if (m_id == 0) m_id = 1;
+    return m_id;
 }
