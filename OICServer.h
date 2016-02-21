@@ -6,15 +6,14 @@
 class OICServer : public OICBase
 {
 public:
-    OICServer(String name):OICBase(name){}
-    void start(String ip, String interface);
+    OICServer(String name, COAPSend sender):OICBase(name, sender){}
+    void start();
     void addResource(OICResource* res) {res->setCoapServer(&coap_server); m_resources.append(res);}
 private:
     static void* runDiscovery(void*param);
     bool onRequest(COAPServer* server, COAPPacket* request, COAPPacket* response);
     bool discoveryRequest(COAPServer* server, COAPPacket* request, COAPPacket* response);
     OICResource* getResource(String href);
-    pthread_t m_discoveryThread;
     List<OICResource*> m_resources;
 };
 

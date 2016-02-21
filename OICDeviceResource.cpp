@@ -28,7 +28,7 @@ void OICDeviceResource::post(cbor* value, COAPResponseHandler handler){
 
     p->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, data));
 
-    m_client->send(p, handler);
+    m_client->send_packet(p, handler);
 }
 
 void OICDeviceResource::get(COAPResponseHandler handler){
@@ -38,7 +38,7 @@ void OICDeviceResource::get(COAPResponseHandler handler){
     p->setAddress(m_device->getAddress());
 
     COAPPacket::parseUri(p, m_href);
-    m_client->send(p, handler);
+    m_client->send_packet(p, handler);
 }
 
 void OICDeviceResource::observe(COAPResponseHandler handler){
@@ -52,5 +52,5 @@ void OICDeviceResource::observe(COAPResponseHandler handler){
 
     COAPPacket::parseUri(p, m_href);
 
-    m_client->send(p, handler);
+    m_client->send_packet(p, handler);
 }

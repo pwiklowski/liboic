@@ -7,7 +7,7 @@
 class OICClient : public OICBase
 {
 public:
-    OICClient();
+    OICClient(COAPSend sender);
 
     void searchDevices(COAPResponseHandler handler);
 

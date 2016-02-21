@@ -24,7 +24,7 @@ public:
     String getId() { return m_id; }
     String getName() { return m_name;}
 
-    void send(COAPPacket* packet, COAPResponseHandler func);
+    void send_packet(COAPPacket* packet, COAPResponseHandler func);
 
 private:
     String m_id;

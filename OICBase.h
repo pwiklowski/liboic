@@ -24,44 +24,31 @@ class OICResource;
 class OICBase
 {
 public:
-    OICBase(String name);
+    OICBase(String name, COAPSend sender);
 
     void start(String ip, String interface);
     void stop();
 
-    void send(COAPPacket* packet, COAPResponseHandler func);
-#ifdef IPV6
-void send(sockaddr_in6 destination, COAPPacket* packet, COAPResponseHandler func);
-#endif
-
 #ifdef IPV4
-void send(sockaddr_in destination, COAPPacket* packet, COAPResponseHandler func);
+    String convertAddress(sockaddr_in addr);
 #endif
-
     COAPServer* getCoapServer() { return &coap_server; }
 
-    int  getSocketFd() { return m_socketFd; }
-    void setSocketFd(int socket) { m_socketFd = socket; }
-
+    uint16_t getMessageId();
+    COAPSend send_packet;
     bool isClient() { return m_is_client; }
 protected:
-    uint16_t getMessageId();
 #ifdef IPV6
     String convertAddress(sockaddr_in6 addr);
 #endif
 
-#ifdef IPV4
-    String convertAddress(sockaddr_in addr);
-#endif
-    static void* run(void*param);
 
     OICResource* getResource(String href);
 
-    pthread_t m_thread;
+
 
     uint8_t buffer[1024];
     COAPServer coap_server;
-    int m_socketFd;
     String m_name;
     bool m_is_client;
     uint16_t m_id;

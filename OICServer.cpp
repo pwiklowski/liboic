@@ -2,14 +2,12 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <stdio.h>
-#include <arpa/inet.h>
 #include <iostream>
 #include "log.h"
 #include "cbor.h"
 #include <netdb.h>
 #include <stdio.h>
 #include "String.h"
-#include <net/if.h>
 #include "COAPObserver.h"
 
 
@@ -97,11 +95,7 @@ bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* r
     return false;
 
 }
-void OICServer::start(String ip, String interface){
-
-    coap_server.setInterface(interface);
-    coap_server.setIp(ip);
-
+void OICServer::start(){
     COAPCallback discoveryCallback = [=](COAPServer* server, COAPPacket* request, COAPPacket* response) {
         return this->discoveryRequest(server, request, response);
     };
@@ -113,90 +107,7 @@ void OICServer::start(String ip, String interface){
             return this->onRequest(server, request, response);
         });
     }
-
-    pthread_create(&m_thread, NULL, &OICServer::run, this);
-    pthread_create(&m_discoveryThread, NULL, &OICServer::runDiscovery, this);
 }
-
-void* OICServer::runDiscovery(void* param){
-    OICServer* oic_server = (OICServer*) param;
-    COAPServer* coap_server = oic_server->getCoapServer();
-
-    const int on = 1;
-#ifdef IPV6
-    int fd = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-    struct sockaddr_in6 serv, client;
-    serv.sin6_family = AF_INET6;
-    serv.sin6_port = htons(5683);
-    serv.sin6_scope_id = if_nametoindex(coap_server->getInterface().c_str());
-
-    serv.sin6_addr = in6addr_any;
-    if (inet_pton(AF_INET6, coap_server->getIp().c_str(), &(serv.sin6_addr)) < 0){
-        log("Unable to bind");
-        return 0;
-    }
-    if (inet_pton(AF_INET6, "ff02::fd", &(mreq.ipv6mr_multiaddr)) < 0){
-        log("Unable to bind");
-        return 0;
-    }
-    mreq.ipv6mr_interface = if_nametoindex(coap_server->getInterface().c_str());
-
-    if (setsockopt(sockfd,IPPROTO_IPV6, IPV6_JOIN_GROUP, &mreq, sizeof(mreq)) < 0) {
-        log("unable to make it listen for multicast");
-       return 0;
-    }
-#endif
-
-
-#ifdef IPV4
-    int fd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-    struct sockaddr_in serv,client;
-    struct ip_mreq mreq;
-
-    serv.sin_family = AF_INET;
-    if (oic_server->isClient())
-        serv.sin_port = 0;
-    else
-        serv.sin_port = htons(5683);
-    serv.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    if (!oic_server->isClient()){
-        mreq.imr_multiaddr.s_addr=inet_addr("224.0.1.187");
-        mreq.imr_interface.s_addr=htonl(INADDR_ANY);
-        if (setsockopt(fd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
-            return 0;
-        }
-    }
-#endif
-
-    uint8_t buffer[1024];
-    socklen_t l = sizeof(client);
-    if(setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
-    {
-        log("Unable to set reuse");
-        return 0;
-    }
-    if( bind(fd , (struct sockaddr*)&serv, sizeof(serv) ) == -1)
-    {
-        log("Unable to bind");
-        return 0;
-    }
-
-
-    while(1){
-        size_t rc= recvfrom(fd,buffer,sizeof(buffer),0,(struct sockaddr *)&client,&l);
-        log("discovery thread received packet");
-        if(rc<0)
-        {
-            std::cout<<"ERROR READING FROM SOCKET";
-            continue;
-        }
-        COAPPacket* p = new COAPPacket(buffer, rc, oic_server->convertAddress(client));
-
-        coap_server->handleMessage(p);
-    }
-}
-
 
 OICResource* OICServer::getResource(String href){
     for(uint16_t i=0; i<m_resources.size();i++){

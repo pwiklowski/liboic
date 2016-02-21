@@ -2,9 +2,10 @@
 #include "OICDevice.h"
 #include "OICDeviceResource.h"
 
-OICClient::OICClient():
-    OICBase("")
+OICClient::OICClient(COAPSend sender):
+    OICBase("", sender)
 {
+    send_packet = sender;
     m_is_client = true;
 }
 
@@ -17,7 +18,7 @@ void OICClient::searchDevices(COAPResponseHandler handler){
 
     p->setMessageId(0);
     //p->setAddress("ff02::fd 5683");
-    p->setAddress("224.0.1.187 5683");
+    p->setAddress("224.0.1.187 5683"); //TODO: move it to application
 
-    send(p, handler);
+    send_packet(p, handler);
 }
