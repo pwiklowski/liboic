@@ -1,21 +1,16 @@
 #ifndef OICRESOURCE_H
 #define OICRESOURCE_H
 
-
-#include "String.h"
-#include "COAPServer.h"
-#include <functional>
-#include <iostream>
 #include "cbor.h"
 #include "COAPObserver.h"
+#include "FastFunc.hpp"
 
-using namespace std;
-
+class COAPServer;
 
 class OICResource
 {
 public:
-    OICResource(String href, String rt, String iff, function<void(cbor *)> onUpdate, cbor *initial);
+    OICResource(String href, String rt, String iff,  ssvu::FastFunc<void(cbor *)> onUpdate, cbor *initial);
     ~OICResource();
 
     void setCoapServer(COAPServer* s){ m_coapServer = s; }
@@ -42,7 +37,7 @@ private:
 
 
     cbor* m_value;
-    function<void(cbor*)> m_onUpdate;
+    ssvu::FastFunc< void(cbor*) > m_onUpdate;
 };
 
 #endif // OICRESOURCE_H

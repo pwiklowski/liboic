@@ -1,6 +1,7 @@
 #include "OICResource.h"
+#include "COAPServer.h"
 
-OICResource::OICResource(String href, String rt, String iff, function<void(cbor *)> onUpdate, cbor* initial)
+OICResource::OICResource(String href, String rt, String iff,  ssvu::FastFunc<void(cbor *)> onUpdate, cbor* initial)
 {
     m_href = href;
     m_rt = rt;
@@ -25,7 +26,7 @@ void OICResource::update(cbor* value, bool notify) {
     m_coapServer->notify(m_href, data);
 
     if (notify){
-        if (m_onUpdate != 0)
+        if (m_onUpdate != nullptr)
             m_onUpdate(m_value);
     }
 
