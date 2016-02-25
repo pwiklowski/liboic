@@ -1,11 +1,7 @@
 #include "OICServer.h"
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <stdio.h>
-#include <iostream>
 #include "log.h"
 #include "cbor.h"
-#include <netdb.h>
 #include <stdio.h>
 #include "String.h"
 #include "COAPObserver.h"
