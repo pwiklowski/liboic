@@ -1,9 +1,10 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+This is my own implentation of OIC (Open Interconnect Consortium)
+
 
 ### TODO ###
 
 * Remove observers when they ask to do so
 * Remove observers when they die 
-* Message retransmission 
+* Message retransmission
