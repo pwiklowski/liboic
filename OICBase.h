@@ -21,22 +21,13 @@ public:
     void stop();
 
     COAPServer* getCoapServer() { return &coap_server; }
-
-    uint16_t getMessageId();
-    COAPSend send_packet;
     bool isClient() { return m_is_client; }
 protected:
-
-
     OICResource* getResource(String href);
-
-
-
     uint8_t buffer[1024];
     COAPServer coap_server;
     String m_name;
     bool m_is_client;
-    uint16_t m_id;
 };
 
 #endif // OICSERVER_H

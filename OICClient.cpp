@@ -5,7 +5,6 @@
 OICClient::OICClient(COAPSend sender):
     OICBase("", sender)
 {
-    send_packet = sender;
     m_is_client = true;
 }
 
@@ -20,5 +19,5 @@ void OICClient::searchDevices(COAPResponseHandler handler){
     //p->setAddress("ff02::fd 5683");
     p->setAddress("224.0.1.187 5683"); //TODO: move it to application
 
-    send_packet(p, handler);
+    getCoapServer()->sendPacket(p, handler);
 }

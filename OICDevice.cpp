@@ -12,5 +12,5 @@ OICDevice::OICDevice(String id, String name, String address, OICClient *client)
 }
 
 void OICDevice::send_packet(COAPPacket* packet, COAPResponseHandler func){
-    m_client->send_packet(packet, func);
+    m_client->getCoapServer()->sendPacket(packet, func);
 }
