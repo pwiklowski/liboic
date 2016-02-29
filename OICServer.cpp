@@ -17,7 +17,7 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
         cbor* root = new cbor(CBOR_TYPE_ARRAY);
         cbor* device = new cbor(CBOR_TYPE_MAP);
 
-        device->append(new cbor("di"), new cbor("0685B960-736F-46F7-BEC0-9E6CBD61ADC1"));
+        device->append(new cbor("di"), new cbor("0685B960-736F-46F7-BEC0-9E6CBD61ADC2"));
         device->append(new cbor("n"), new cbor(m_name));
 
         cbor* links = cbor::array();
