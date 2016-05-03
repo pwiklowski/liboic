@@ -53,3 +53,19 @@ void OICDeviceResource::observe(COAPResponseHandler handler){
 
     m_client->getCoapServer()->sendPacket(p, handler);
 }
+
+
+void OICDeviceResource::unobserve(COAPResponseHandler handler){
+    COAPPacket* p = new COAPPacket();
+    p->setType(COAP_TYPE_CON);
+    p->setResonseCode(COAP_METHOD_GET);
+    p->setAddress(m_device->getAddress());
+
+    List<uint8_t> data;
+    data.append(1);
+    p->addOption(new COAPOption(COAP_OPTION_OBSERVE, data));
+
+    COAPPacket::parseUri(p, m_href);
+
+    m_client->getCoapServer()->sendPacket(p, handler);
+}

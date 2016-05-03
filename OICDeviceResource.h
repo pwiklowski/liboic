@@ -23,6 +23,7 @@ public:
     void post(cbor *value, COAPResponseHandler handler);
     void get(COAPResponseHandler handler);
     void observe(COAPResponseHandler handler);
+    void unobserve(COAPResponseHandler handler);
 private:
     OICDevice* m_device;
     OICClient* m_client;
