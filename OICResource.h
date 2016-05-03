@@ -10,7 +10,7 @@ class COAPServer;
 class OICResource
 {
 public:
-    OICResource(String href, String rt, String iff,  ssvu::FastFunc<void(cbor *)> onUpdate, cbor *initial);
+    OICResource(String href, String rt, String iff,  ssvu::FastFunc<void (cbor)> onUpdate, cbor initial);
     ~OICResource();
 
     void setCoapServer(COAPServer* s){ m_coapServer = s; }
@@ -22,10 +22,10 @@ public:
     COAPCallback getCallback(){ return m_callback;}
 
 
-    void update(cbor* value, bool notify = false);
-    void onUpdate(cbor* value) { m_onUpdate(value);}
+    void update(cbor value, bool notify = false);
+    void onUpdate(cbor value) { m_onUpdate(value);}
 
-    cbor* value() {return m_value;}
+    cbor value() {return m_value;}
 
     void addObserver(COAPObserver* observer);
 private:
@@ -36,8 +36,8 @@ private:
     COAPServer* m_coapServer;
 
 
-    cbor* m_value;
-    ssvu::FastFunc< void(cbor*) > m_onUpdate;
+    cbor m_value;
+    ssvu::FastFunc< void(cbor) > m_onUpdate;
 };
 
 #endif // OICRESOURCE_H

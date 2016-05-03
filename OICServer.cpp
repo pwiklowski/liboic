@@ -14,32 +14,27 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
 
         List<uint8_t> p;
 
-        cbor* root = new cbor(CBOR_TYPE_ARRAY);
-        cbor* device = new cbor(CBOR_TYPE_MAP);
+        cbor root(CBOR_TYPE_ARRAY);
+        cbor device(CBOR_TYPE_MAP);
 
-        device->append(new cbor("di"), new cbor("0685B960-736F-46F7-BEC0-9E6CBD61ADC2"));
-        device->append(new cbor("n"), new cbor(m_name));
+        device.append("di", m_id);
+        device.append("n", m_name);
 
-        cbor* links = cbor::array();
+        cbor links(CBOR_TYPE_ARRAY);
 
         for(uint16_t i=0; i<m_resources.size();i++){
-            cbor* val = cbor::map();
+            cbor val(CBOR_TYPE_MAP);
 
-            val->append(new cbor("href"), new cbor(m_resources.at(i)->getHref()));
-            val->append(new cbor("rt"), new cbor(m_resources.at(i)->getResourceType()));
-            val->append(new cbor("if"), new cbor(m_resources.at(i)->getInterface()));
-            val->append(new cbor("type"), new cbor("application/cbor"));
+            val.append("href", m_resources.at(i)->getHref());
+            val.append("rt", m_resources.at(i)->getResourceType());
+            val.append("if", m_resources.at(i)->getInterface());
+            val.append("type", "application/cbor");
 
-            links->append(val);
+            links.append(val);
         }
-
-        device->append(new cbor("links"), links);
-
-        root->append(device);
-
-        root->dump(&p);
-
-        delete root;
+        device.append("links", links);
+        root.append(device);
+        root.dump(&p);
 
         List<uint8_t> data;
         data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF00) >> 8);
@@ -64,7 +59,7 @@ bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* r
 
 
         if (resource != 0){
-            resource->value()->dump(response->getPayload());
+            resource->value().dump(response->getPayload());
         }
 
         List<uint8_t> data;
@@ -78,13 +73,13 @@ bool OICServer::onRequest(COAPServer* server, COAPPacket* request, COAPPacket* r
     }else if(request->getCode() == COAP_METHOD_POST){
         response->setResonseCode(COAP_RSPCODE_CHANGED);
 
-        cbor* message = cbor::parse(request->getPayload());
+        cbor message;
+        cbor::parse(&message, request->getPayload());
 
         if (resource != 0){
             resource->update(message, true);
         }
 
-        delete message;
         return true;
 
     }

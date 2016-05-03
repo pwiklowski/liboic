@@ -18,7 +18,6 @@ void OICDeviceResource::post(cbor* value, COAPResponseHandler handler){
     p->setAddress(m_device->getAddress());
 
     value->dump(p->getPayload());
-    delete value;
 
     COAPPacket::parseUri(p, m_href);
 
