@@ -8,6 +8,15 @@ OICClient::OICClient(COAPSend sender):
     m_is_client = true;
 }
 
+void OICClient::ping(String address, COAPResponseHandler handler){
+    COAPPacket* p = new COAPPacket();
+    p->setType(COAP_TYPE_CON);
+    p->setResonseCode(COAP_METHOD_GET);
+    p->setAddress(address); //TODO: move it to application
+    getCoapServer()->sendPacket(p, handler);
+}
+
+
 void OICClient::searchDevices(COAPResponseHandler handler){
     COAPPacket* p = new COAPPacket();
     p->setType(COAP_TYPE_CON);

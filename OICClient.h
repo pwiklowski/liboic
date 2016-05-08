@@ -9,6 +9,7 @@ class OICClient : public OICBase
 public:
     OICClient(COAPSend sender);
 
+    void ping(String address, COAPResponseHandler handler);
     void searchDevices(COAPResponseHandler handler);
 
 private:
