@@ -24,7 +24,7 @@ void OICResource::update(cbor value, bool notify) {
     List<uint8_t> data;
     m_value.dump(&data);
 
-    m_coapServer->notify(m_href, data);
+    m_coapServer->notify(m_href, &data);
 
     if (notify){
         if (m_onUpdate != nullptr)
