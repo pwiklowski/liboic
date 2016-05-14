@@ -100,6 +100,12 @@ void OICServer::start(){
     }
 }
 
+OICServer::~OICServer(){
+    for(uint16_t i=0; i<m_resources.size(); i++){
+        delete m_resources.at(i);
+    }
+}
+
 OICResource* OICServer::getResource(String href){
     for(uint16_t i=0; i<m_resources.size();i++){
         if (m_resources.at(i)->getHref() == href) return m_resources.at(i);

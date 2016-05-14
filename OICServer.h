@@ -9,6 +9,7 @@ public:
     OICServer(String name, String di, COAPSend sender):OICBase(name, sender){
         m_id = di;
     }
+    ~OICServer();
     void start();
     void addResource(OICResource* res) {res->setCoapServer(&coap_server); m_resources.append(res);}
 private:
