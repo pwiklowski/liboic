@@ -12,7 +12,6 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
     if (request->getCode() == COAP_METHOD_GET){
         response->setResonseCode(COAP_RSPCODE_CONTENT);
 
-        List<uint8_t> p;
 
         cbor root(CBOR_TYPE_ARRAY);
         cbor device(CBOR_TYPE_MAP);
@@ -34,14 +33,13 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
         }
         device.append("links", links);
         root.append(device);
-        root.dump(&p);
+        root.dump(response->getPayload());
 
         List<uint8_t> data;
         data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF00) >> 8);
         data.append(((uint16_t)COAP_CONTENTTYPE_CBOR & 0xFF));
 
         response->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, data));
-        response->addPayload(p);
         response->setMessageId(request->getMessageId());
 
         return true;
