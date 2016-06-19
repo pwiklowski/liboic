@@ -1,5 +1,4 @@
 #include "OICBase.h"
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <stdio.h>
 
