@@ -20,7 +20,7 @@ public:
     String getResourceType() { return m_resourceType; }
     String getInterface() { return m_interface; }
 
-    void post(cbor *value, COAPResponseHandler handler);
+    void post(cbor value, COAPResponseHandler handler);
     void get(COAPResponseHandler handler);
     void observe(COAPResponseHandler handler);
     void unobserve(COAPResponseHandler handler);

@@ -10,14 +10,14 @@ OICDeviceResource::OICDeviceResource(String href, String interface, String resou
     m_resourceType = resourceType;
 }
 
-void OICDeviceResource::post(cbor* value, COAPResponseHandler handler){
+void OICDeviceResource::post(cbor value, COAPResponseHandler handler){
 
     COAPPacket* p = new COAPPacket();
     p->setType(COAP_TYPE_CON);
     p->setResonseCode(COAP_METHOD_POST);
     p->setAddress(m_device->getAddress());
 
-    value->dump(p->getPayload());
+    value.dump(p->getPayload());
 
     COAPPacket::parseUri(p, m_href);
 
