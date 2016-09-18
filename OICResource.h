@@ -10,7 +10,7 @@ class COAPServer;
 class OICResource
 {
 public:
-    OICResource(String href, String rt, String iff,  ssvu::FastFunc<void (cbor)> onUpdate, cbor initial);
+    OICResource(String href, String rt, String iff,  ssvu::FastFunc<void (cbor)> onUpdate, cbor* initial);
     ~OICResource();
 
     void setCoapServer(COAPServer* s){ m_coapServer = s; }
@@ -25,7 +25,7 @@ public:
     void update(cbor value, bool notify = false);
     void onUpdate(cbor value) { m_onUpdate(value);}
 
-    cbor value() {return m_value;}
+    cbor value() {return *m_value;}
 
     void addObserver(COAPObserver* observer);
 private:
@@ -36,7 +36,7 @@ private:
     COAPServer* m_coapServer;
 
 
-    cbor m_value;
+    cbor* m_value;
     ssvu::FastFunc< void(cbor) > m_onUpdate;
 };
 

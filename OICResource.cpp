@@ -2,7 +2,7 @@
 #include "COAPServer.h"
 #include "log.h"
 
-OICResource::OICResource(String href, String rt, String iff,  ssvu::FastFunc<void(cbor)> onUpdate, cbor initial)
+OICResource::OICResource(String href, String rt, String iff,  ssvu::FastFunc<void(cbor)> onUpdate, cbor *initial)
 {
     m_href = href;
     m_rt = rt;
@@ -18,17 +18,17 @@ OICResource::~OICResource()
 }
 
 void OICResource::update(cbor value, bool notify) {
-    log("OICResource Update");
-    m_value = value;
-
-    List<uint8_t> data;
-    m_value.dump(&data);
-
-    m_coapServer->notify(m_href, &data);
+    log("OICResource Update"); //TODO: copy only importatnd values
 
     if (notify){
         if (m_onUpdate != nullptr)
-            m_onUpdate(m_value);
+            m_onUpdate(value);
+        List<uint8_t> data;
+        (*m_value).dump(&data);
+
+        m_coapServer->notify(m_href, &data);
     }
+
+
 
 }
