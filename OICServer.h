@@ -8,10 +8,12 @@ class OICServer : public OICBase
 public:
     OICServer(String name, String di, COAPSend sender):OICBase(name, sender){
         m_id = di;
+        m_mutex = PTHREAD_MUTEX_INITIALIZER;
     }
     ~OICServer();
     void start();
     void addResource(OICResource* res) {res->setCoapServer(&coap_server); m_resources.append(res);}
+
 private:
     static void* runDiscovery(void*param);
     bool onRequest(COAPServer* server, COAPPacket* request, COAPPacket* response);
@@ -19,6 +21,8 @@ private:
     OICResource* getResource(String href);
     List<OICResource*> m_resources;
     String m_id;
+
+
 };
 
 #endif // OICSERVER_H

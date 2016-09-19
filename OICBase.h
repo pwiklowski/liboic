@@ -20,7 +20,11 @@ public:
     void start(String ip, String interface);
     void stop();
 
-    COAPServer* getCoapServer() { return &coap_server; }
+    void sendPacket(COAPPacket* p, COAPResponseHandler handler);
+    void handleMessage(COAPPacket* p);
+    void checkPackets();
+    void notify(String href, List<uint8_t> *data);
+
     bool isClient() { return m_is_client; }
 protected:
     OICResource* getResource(String href);
@@ -28,6 +32,8 @@ protected:
     COAPServer coap_server;
     String m_name;
     bool m_is_client;
+    pthread_mutex_t m_mutex;
+
 };
 
 #endif // OICSERVER_H
