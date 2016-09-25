@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "OICResource.h"
 #include "cbor.h"
-
+#include <pthread.h>
 
 
 typedef void(*OICServerSendData)(uint8_t*, uint16_t);
@@ -32,8 +32,10 @@ protected:
     COAPServer coap_server;
     String m_name;
     bool m_is_client;
-    pthread_mutex_t m_mutex;
 
+#ifndef ESP8266
+    pthread_mutex_t m_mutex;
+#endif
 };
 
 #endif // OICSERVER_H

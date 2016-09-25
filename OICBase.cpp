@@ -25,25 +25,41 @@ void OICBase::stop(){
 
 }
 void OICBase::sendPacket(COAPPacket* p, COAPResponseHandler handler){
-    pthread_mutex_lock(&m_mutex);
+#ifndef ESP8266
+    pthread_mutex_lock(&m_mutex); //try lock ?
+#endif
     coap_server.sendPacket(p, handler);
+#ifndef ESP8266
     pthread_mutex_unlock(&m_mutex);
+#endif
 }
 void OICBase::handleMessage(COAPPacket* p){
+#ifndef ESP8266
     pthread_mutex_lock(&m_mutex);
+#endif
     coap_server.handleMessage(p);
+#ifndef ESP8266
     pthread_mutex_unlock(&m_mutex);
+#endif
 }
 
 void OICBase::checkPackets(){
+#ifndef ESP8266
     pthread_mutex_lock(&m_mutex);
+#endif
     coap_server.checkPackets();
+#ifndef ESP8266
     pthread_mutex_unlock(&m_mutex);
+#endif
 }
 
 void OICBase::notify(String href, List<uint8_t> *data){
+#ifndef ESP8266
     pthread_mutex_lock(&m_mutex);
+#endif
     coap_server.notify(href, data);
+#ifndef ESP8266
     pthread_mutex_unlock(&m_mutex);
+#endif
 }
 
