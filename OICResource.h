@@ -15,15 +15,15 @@ public:
 
     void setCoapServer(COAPServer* s){ m_coapServer = s; }
 
-    String getHref(){ return m_href; }
-    String getResourceType(){ return m_rt; }
-    String getInterface(){ return m_if; }
+    String& getHref(){ return m_href; }
+    String& getResourceType() { return m_rt; }
+    String& getInterface() { return m_if; }
 
     COAPCallback getCallback(){ return m_callback;}
 
 
     void update(cbor value, bool notify = false);
-    void onUpdate(cbor value) { m_onUpdate(value);}
+    void onUpdate(cbor& value) { m_onUpdate(value);}
 
     cbor value() {return *m_value;}
 
