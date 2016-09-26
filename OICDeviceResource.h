@@ -6,6 +6,9 @@
 #include "COAPServer.h"
 #include "cbor.h"
 #include "OICClient.h"
+#ifndef ESP8266
+#include "pthread.h"
+#endif
 
 using namespace std;
 
@@ -30,7 +33,9 @@ private:
     String m_href;
     String m_interface;
     String m_resourceType;
-
+#ifndef ESP8266
+    pthread_mutex_t m_mutex;
+#endif
 };
 
 #endif // OICDEVICERESOURCE_H

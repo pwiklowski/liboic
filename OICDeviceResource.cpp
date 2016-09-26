@@ -8,10 +8,15 @@ OICDeviceResource::OICDeviceResource(String href, String interface, String resou
     m_href = href;
     m_interface = interface;
     m_resourceType = resourceType;
+#ifndef ESP8266
+    m_mutex =PTHREAD_MUTEX_INITIALIZER;
+#endif
 }
 
 void OICDeviceResource::post(cbor value, COAPResponseHandler handler){
-
+#ifndef ESP8266
+    pthread_mutex_lock(&m_mutex);
+#endif
     COAPPacket* p = new COAPPacket();
     p->setType(COAP_TYPE_CON);
     p->setResonseCode(COAP_METHOD_POST);
@@ -27,7 +32,15 @@ void OICDeviceResource::post(cbor value, COAPResponseHandler handler){
 
     p->addOption(new COAPOption(COAP_OPTION_CONTENT_FORMAT, data));
 
-    m_client->sendPacket(p, handler);
+    m_client->sendPacket(p, [=](COAPPacket* p){
+#ifndef ESP8266
+        pthread_mutex_unlock(&m_mutex);
+#endif
+        handler(p);
+    });
+
+
+
 }
 
 void OICDeviceResource::get(COAPResponseHandler handler){
