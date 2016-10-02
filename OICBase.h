@@ -23,6 +23,7 @@ public:
     void sendPacket(COAPPacket* p, COAPResponseHandler handler);
     void handleMessage(COAPPacket* p);
     void checkPackets();
+    void sendQueuedPackets();
     void notify(String href, List<uint8_t> *data);
 
     bool isClient() { return m_is_client; }

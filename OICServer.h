@@ -9,9 +9,6 @@ public:
     OICServer(String name, String di, COAPSend sender):OICBase(name, sender){
         m_id = di;
 
-#ifndef ESP8266
-        m_mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
     }
     ~OICServer();
     void start();

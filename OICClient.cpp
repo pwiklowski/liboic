@@ -13,7 +13,7 @@ void OICClient::ping(String address, COAPResponseHandler handler){
     p->setType(COAP_TYPE_CON);
     p->setResonseCode(COAP_METHOD_GET);
     p->setAddress(address); //TODO: move it to application
-    coap_server.sendPacket(p, handler);
+    sendPacket(p, handler);
 }
 
 
@@ -28,5 +28,5 @@ void OICClient::searchDevices(COAPResponseHandler handler){
     //p->setAddress("ff02::fd 5683");
     p->setAddress("224.0.1.187 5683"); //TODO: move it to application
 
-    coap_server.sendPacket(p, handler);
+    sendPacket(p, handler);
 }

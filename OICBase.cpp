@@ -14,6 +14,9 @@ OICBase::OICBase(String name, COAPSend sender):
 {
     m_name = name;
     m_is_client = false;
+#ifndef ESP8266
+    m_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
 }
 void OICBase::start(String ip, String interface){
 
@@ -26,7 +29,12 @@ void OICBase::stop(){
 }
 void OICBase::sendPacket(COAPPacket* p, COAPResponseHandler handler){
 #ifndef ESP8266
-    pthread_mutex_lock(&m_mutex); //try lock ?
+
+    if (pthread_mutex_trylock(&m_mutex) != 0)
+    {
+        coap_server.queuePacket(p, handler);
+        return;
+    }
 #endif
     coap_server.sendPacket(p, handler);
 #ifndef ESP8266
@@ -41,6 +49,18 @@ void OICBase::handleMessage(COAPPacket* p){
 #ifndef ESP8266
     pthread_mutex_unlock(&m_mutex);
 #endif
+}
+
+void OICBase::sendQueuedPackets(){
+#ifndef ESP8266
+    pthread_mutex_lock(&m_mutex);
+#endif
+    coap_server.sendQueuedPackets();
+#ifndef ESP8266
+    pthread_mutex_unlock(&m_mutex);
+#endif
+
+
 }
 
 void OICBase::checkPackets(){
