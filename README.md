@@ -1,10 +1,22 @@
-# README #
+# What is it ?# What is it ?
+This repository contains c++ implementaion OIC server/client. It was succesfully used on multiple platforms - PC, Android, STM32, ESP8266 and RaspberyPI with multiple protocols - IPv4, IPv6 and propraietary protocol using RFM69 radio modules (LoRaWAN is in progress).
 
-This is my own implentation of OIC (Open Interconnect Consortium)
+# How to use it ?
+```
+cmake .
+make
+```
+If you want more details how to use it take a look at liboic implementaion or wait for more detailed description how to use it.
 
+# Requiremnts
+- c++11
+- https://github.com/pwiklowski/lightstdlib
+- https://github.com/pwiklowski/libcoap
+ 
+# TODO:
+- Provide more examples using IPv4, IPv6 and RFM69 radio modules.
+- Create more detailed description how to use it
 
-### TODO ###
+# License:
+MIT
 
-* Remove observers when they ask to do so
-* Remove observers when they die 
-* Message retransmission
