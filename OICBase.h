@@ -24,7 +24,7 @@ public:
     void handleMessage(COAPPacket* p);
     void checkPackets();
     void sendQueuedPackets();
-    void notify(String href, List<uint8_t> *data);
+    void notify(String href, SimpleList<uint8_t> *data);
 
     bool isClient() { return m_is_client; }
 protected:

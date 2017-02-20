@@ -73,7 +73,7 @@ void OICBase::checkPackets(){
 #endif
 }
 
-void OICBase::notify(String href, List<uint8_t> *data){
+void OICBase::notify(String href, SimpleList<uint8_t> *data){
 #ifndef ESP8266
     pthread_mutex_lock(&m_mutex);
 #endif
