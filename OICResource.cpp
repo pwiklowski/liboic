@@ -18,8 +18,6 @@ OICResource::~OICResource()
 }
 
 void OICResource::update(cbor value, bool notify) {
-    log("OICResource Update"); //TODO: copy only importatnd values
-
     if (notify){
         if (m_onUpdate != nullptr)
             m_onUpdate(value);
@@ -28,7 +26,4 @@ void OICResource::update(cbor value, bool notify) {
 
         m_coapServer->notify(m_href, &data);
     }
-
-
-
 }
