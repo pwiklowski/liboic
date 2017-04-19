@@ -2,11 +2,12 @@
 #include "COAPServer.h"
 #include "log.h"
 
-OICResource::OICResource(String href, String rt, String iff,  ssvu::FastFunc<void(cbor)> onUpdate, cbor *initial)
+OICResource::OICResource(String name, String href, String rt, String iff,  ssvu::FastFunc<void(cbor)> onUpdate, cbor *initial)
 {
     m_href = href;
     m_rt = rt;
     m_if = iff;
+    m_name = name;
 
     m_onUpdate = onUpdate;
     m_value = initial;

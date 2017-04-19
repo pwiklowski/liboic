@@ -10,7 +10,7 @@ class COAPServer;
 class OICResource
 {
 public:
-    OICResource(String href, String rt, String iff,  ssvu::FastFunc<void (cbor)> onUpdate, cbor* initial);
+    OICResource(String name, String href, String rt, String iff,  ssvu::FastFunc<void (cbor)> onUpdate, cbor* initial);
     ~OICResource();
 
     void setCoapServer(COAPServer* s){ m_coapServer = s; }
@@ -18,6 +18,7 @@ public:
     String& getHref(){ return m_href; }
     String& getResourceType() { return m_rt; }
     String& getInterface() { return m_if; }
+    String& getName() { return m_name; }
 
     COAPCallback getCallback(){ return m_callback;}
 
@@ -32,6 +33,7 @@ private:
     String m_href;
     String m_rt;
     String m_if;
+    String m_name;
     COAPCallback m_callback;
     COAPServer* m_coapServer;
 

@@ -17,11 +17,12 @@ class OICDevice;
 class OICDeviceResource
 {
 public:
-    OICDeviceResource(String href, String interface, String resourceType, OICDevice* device, OICClient* client);
+    OICDeviceResource(String name, String href, String interface, String resourceType, OICDevice* device, OICClient* client);
 
-    String getHref() { return m_href;}
-    String getResourceType() { return m_resourceType; }
-    String getInterface() { return m_interface; }
+    String& getHref() { return m_href;}
+    String& getName() { return m_name;}
+    String& getResourceType() { return m_resourceType; }
+    String& getInterface() { return m_interface; }
 
     void post(cbor value, COAPResponseHandler handler);
     void get(COAPResponseHandler handler);
@@ -33,6 +34,7 @@ private:
     String m_href;
     String m_interface;
     String m_resourceType;
+    String m_name;
 #ifndef ESP8266
     pthread_mutex_t m_mutex;
 #endif

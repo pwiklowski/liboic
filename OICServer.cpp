@@ -27,6 +27,7 @@ bool OICServer::discoveryRequest(COAPServer* server, COAPPacket* request, COAPPa
             val.append("href", m_resources.at(i)->getHref());
             val.append("rt", m_resources.at(i)->getResourceType());
             val.append("if", m_resources.at(i)->getInterface());
+            val.append("n", m_resources.at(i)->getName());
             val.append("type", "application/cbor");
 
             links.append(val);

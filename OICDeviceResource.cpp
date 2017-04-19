@@ -1,11 +1,12 @@
 #include "OICDeviceResource.h"
+#include "log.h"
 
-
-OICDeviceResource::OICDeviceResource(String href, String interface, String resourceType, OICDevice *device, OICClient *client)
+OICDeviceResource::OICDeviceResource(String name, String href, String interface, String resourceType, OICDevice *device, OICClient *client)
 {
     m_device = device;
     m_client = client;
     m_href = href;
+    m_name = name;
     m_interface = interface;
     m_resourceType = resourceType;
 #ifndef ESP8266
