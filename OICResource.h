@@ -5,6 +5,11 @@
 #include "COAPObserver.h"
 #include "FastFunc.hpp"
 
+
+#define RT_OIC_R_LIGHT_DIMMING "oic.r.light.dimming"
+
+
+
 class COAPServer;
 
 class OICResource
